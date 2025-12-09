@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     siteName: "Family Christmas",
     images: [
       {
-        url: "/og-image.png",
+        url: "https://xvmeoczosoteqlvghrbg.supabase.co/storage/v1/object/public/static-assets/og-image.png",
         width: 1200,
         height: 630,
         alt: "Family Christmas",
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Family Christmas",
     description: "Organize family dinners and White Elephant gifts",
-    images: ["/og-image.png"],
+    images: ["https://xvmeoczosoteqlvghrbg.supabase.co/storage/v1/object/public/static-assets/og-image.png"],
   },
   icons: {
     icon: "/favicon.ico",
