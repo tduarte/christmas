@@ -19,6 +19,7 @@ export async function GET() {
         description: gifts.description,
         userName: users.name,
         userEmail: users.email,
+        turnOrder: gifts.turnOrder,
         createdAt: gifts.createdAt,
         updatedAt: gifts.updatedAt,
       })

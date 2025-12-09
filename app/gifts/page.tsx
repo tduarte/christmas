@@ -22,6 +22,7 @@ export default function GiftsPage() {
   const [isParticipating, setIsParticipating] = useState(false);
   const [myGift, setMyGift] = useState<GiftItem | null>(null);
   const [currentUser, setCurrentUser] = useState<{ id: number; email: string } | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -111,6 +112,8 @@ export default function GiftsPage() {
 
       if (res.ok) {
         setShowForm(false);
+        setIsEditing(false);
+        setFormData({ name: '', description: '' });
         fetchGifts();
       }
     } catch (error) {
@@ -119,7 +122,7 @@ export default function GiftsPage() {
   };
 
   const handleDelete = async () => {
-    if (!confirm('Are you sure you want to opt out of White Elephant?')) {
+    if (!confirm('Are you sure you want to remove your gift and opt out of White Elephant?')) {
       return;
     }
 
@@ -139,10 +142,19 @@ export default function GiftsPage() {
     }
   };
 
-  const toggleParticipation = () => {
-    if (isParticipating) {
-      handleDelete();
-    } else {
+  const handleAddGift = () => {
+    setIsEditing(false);
+    setFormData({ name: '', description: '' });
+    setShowForm(true);
+  };
+
+  const handleEditGift = () => {
+    if (myGift) {
+      setIsEditing(true);
+      setFormData({
+        name: myGift.name,
+        description: myGift.description || '',
+      });
       setShowForm(true);
     }
   };
@@ -151,53 +163,24 @@ export default function GiftsPage() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-20">
       <div className="sticky top-0 z-10 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center justify-between">
         <h1 className="text-xl font-bold text-gray-900 dark:text-white">White Elephant</h1>
-        <ThemeToggle />
-      </div>
-
-      <div className="p-4 space-y-6">
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Participation</h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                {isParticipating ? 'You are participating' : 'You are not participating'}
-              </p>
-            </div>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                checked={isParticipating}
-                onChange={toggleParticipation}
-                className="sr-only peer"
-              />
-              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-red-300 dark:peer-focus:ring-red-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-red-600"></div>
-            </label>
-          </div>
-
-          {isParticipating && myGift && (
-            <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900 dark:text-white">{myGift.name}</h3>
-                  {myGift.description && (
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{myGift.description}</p>
-                  )}
-                </div>
-                <button
-                  onClick={() => setShowForm(true)}
-                  className="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-400"
-                >
-                  <Edit2 className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          {isParticipating && (
+            <button
+              onClick={handleAddGift}
+              className="p-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors shadow-sm"
+            >
+              <Plus className="w-5 h-5" />
+            </button>
           )}
         </div>
+      </div>
 
-        {showForm && (
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              {myGift ? 'Edit Your Gift' : 'Add Your Gift'}
+      {showForm && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-xl border border-gray-200 dark:border-gray-700">
+            <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
+              {isEditing ? 'Edit Your Gift' : 'Add Your Gift'}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
@@ -232,9 +215,8 @@ export default function GiftsPage() {
                   type="button"
                   onClick={() => {
                     setShowForm(false);
-                    if (!myGift) {
-                      setFormData({ name: '', description: '' });
-                    }
+                    setIsEditing(false);
+                    setFormData({ name: '', description: '' });
                   }}
                   className="flex-1 py-2 px-4 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                 >
@@ -244,12 +226,66 @@ export default function GiftsPage() {
                   type="submit"
                   className="flex-1 py-2 px-4 rounded-lg bg-red-600 text-white hover:bg-red-700"
                 >
-                  {myGift ? 'Update' : 'Add Gift'}
+                  {isEditing ? 'Update Gift' : 'Add Gift'}
                 </button>
               </div>
             </form>
           </div>
-        )}
+        </div>
+      )}
+
+      <div className="p-4 space-y-6">
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Your Participation</h2>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                {isParticipating ? 'You are participating in White Elephant' : 'Join the White Elephant gift exchange'}
+              </p>
+            </div>
+          </div>
+
+          {!isParticipating ? (
+            <button
+              onClick={handleAddGift}
+              className="w-full py-3 px-4 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors font-medium flex items-center justify-center gap-2"
+            >
+              <Plus className="w-5 h-5" />
+              Add Your Gift to Join
+            </button>
+          ) : myGift ? (
+            <div className="space-y-3">
+              <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-gray-900 dark:text-white">{myGift.name}</h3>
+                    {myGift.description && (
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{myGift.description}</p>
+                    )}
+                    {myGift.turnOrder && (
+                      <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
+                        Turn order: #{myGift.turnOrder}
+                      </p>
+                    )}
+                  </div>
+                  <button
+                    onClick={handleEditGift}
+                    className="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-400"
+                  >
+                    <Edit2 className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+              <button
+                onClick={handleDelete}
+                className="w-full py-2 px-4 rounded-lg border border-red-300 dark:border-red-700 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors font-medium flex items-center justify-center gap-2"
+              >
+                <Trash2 className="w-4 h-4" />
+                Remove Gift & Opt Out
+              </button>
+            </div>
+          ) : null}
+        </div>
 
         <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center justify-between">
