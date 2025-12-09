@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { format, parseISO } from 'date-fns';
+import { addDays, format, parseISO } from 'date-fns';
 import { Clock, MapPin, Users, ArrowLeft, ExternalLink, CheckCircle, XCircle, Edit2, Trash2 } from 'lucide-react';
 import BottomNav from '@/components/BottomNav';
 
@@ -49,7 +49,8 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
   const [showEditForm, setShowEditForm] = useState(false);
   const [editFormData, setEditFormData] = useState({
     title: '',
-    startTime: '',
+    selectedDate: '',
+    startTime: '18:00',
     endTime: '',
     location: '',
     locationUrl: '',
@@ -141,8 +142,9 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
     if (!event) return;
     setEditFormData({
       title: event.title,
-      startTime: format(parseISO(event.startTime), "yyyy-MM-dd'T'HH:mm"),
-      endTime: event.endTime ? format(parseISO(event.endTime), "yyyy-MM-dd'T'HH:mm") : '',
+      selectedDate: format(parseISO(event.startTime), 'yyyy-MM-dd'),
+      startTime: format(parseISO(event.startTime), 'HH:mm'),
+      endTime: event.endTime ? format(parseISO(event.endTime), 'HH:mm') : '',
       location: event.location,
       locationUrl: event.locationUrl || '',
       description: event.description || '',
@@ -155,12 +157,20 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
   const handleEditSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!eventId) return;
+    const startDateTime = new Date(`${editFormData.selectedDate || format(parseISO(event!.startTime), 'yyyy-MM-dd')}T${editFormData.startTime}`);
+    const endDateTime = editFormData.endTime
+      ? new Date(`${editFormData.selectedDate || format(parseISO(event!.startTime), 'yyyy-MM-dd')}T${editFormData.endTime}`)
+      : null;
 
     try {
       const res = await fetch(`/api/events/${eventId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(editFormData),
+        body: JSON.stringify({
+          ...editFormData,
+          startTime: startDateTime.toISOString(),
+          endTime: endDateTime?.toISOString(),
+        }),
       });
 
       if (res.ok) {
@@ -235,6 +245,11 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
   const attendeeIds = new Set(event.attendees.map(a => a.userId));
   const notResponded = allUsers.filter(u => !attendeeIds.has(u.id));
   const isHost = currentUser && event.hostId === currentUser.id;
+  const dateOptions = event
+    ? Array.from({ length: 8 }, (_, i) =>
+        format(addDays(parseISO(event.startTime), i - 1), 'yyyy-MM-dd'),
+      )
+    : [];
 
   return (
     <div className="min-h-screen bg-[var(--background)] dark:bg-[var(--background)] pb-20">
@@ -306,32 +321,83 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
                   />
                 </div>
 
-                <div className="grid grid-cols-1 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-200 mb-1">
+                    Date
+                  </label>
+                  <div className="grid grid-cols-4 gap-2">
+                    {dateOptions.map(date => {
+                      const day = parseInt(date.split('-')[2], 10);
+                      const isSelected = editFormData.selectedDate === date;
+                      return (
+                        <button
+                          key={date}
+                          type="button"
+                          onClick={() => setEditFormData({ ...editFormData, selectedDate: date })}
+                          className={`p-2.5 text-sm rounded-xl border transition-all ${
+                            isSelected
+                              ? 'bg-neutral-900 text-white border-neutral-900 shadow-sm dark:bg-white dark:text-black dark:border-white'
+                              : 'bg-white dark:bg-neutral-900 border-black/10 dark:border-white/10 text-neutral-800 dark:text-neutral-100 hover:bg-neutral-50 dark:hover:bg-neutral-800'
+                          }`}
+                        >
+                          {format(parseISO(date), 'MMM')} {day}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-200 mb-1">
                       Start Time
                     </label>
-                    <input
-                      type="datetime-local"
+                    <select
                       value={editFormData.startTime}
                       onChange={(e) => setEditFormData({ ...editFormData, startTime: e.target.value })}
-                      step="1800"
                       className="w-full rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white p-3 focus:ring-2 focus:ring-neutral-900 dark:focus:ring-white/40 outline-none"
                       required
-                    />
+                    >
+                      {Array.from({ length: 48 }, (_, i) => {
+                        const hour = Math.floor(i / 2);
+                        const minute = (i % 2) * 30;
+                        const value = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+                        const label = `${hour === 0 ? 12 : hour > 12 ? hour - 12 : hour}:${minute
+                          .toString()
+                          .padStart(2, '0')} ${hour < 12 ? 'AM' : 'PM'}`;
+                        return (
+                          <option key={value} value={value}>
+                            {label}
+                          </option>
+                        );
+                      })}
+                    </select>
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-200 mb-1">
                       End Time (optional)
                     </label>
-                    <input
-                      type="datetime-local"
+                    <select
                       value={editFormData.endTime}
                       onChange={(e) => setEditFormData({ ...editFormData, endTime: e.target.value })}
-                      step="1800"
                       className="w-full rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white p-3 focus:ring-2 focus:ring-neutral-900 dark:focus:ring-white/40 outline-none"
-                    />
+                    >
+                      <option value="">—</option>
+                      {Array.from({ length: 48 }, (_, i) => {
+                        const hour = Math.floor(i / 2);
+                        const minute = (i % 2) * 30;
+                        const value = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+                        const label = `${hour === 0 ? 12 : hour > 12 ? hour - 12 : hour}:${minute
+                          .toString()
+                          .padStart(2, '0')} ${hour < 12 ? 'AM' : 'PM'}`;
+                        return (
+                          <option key={value} value={value}>
+                            {label}
+                          </option>
+                        );
+                      })}
+                    </select>
                   </div>
                 </div>
 
