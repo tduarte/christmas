@@ -26,6 +26,31 @@ export default function GiftsPage() {
     description: '',
   });
 
+  const fetchGifts = async () => {
+    try {
+      const giftsRes = await fetch('/api/gifts');
+      if (giftsRes.ok) {
+        const data = await giftsRes.json();
+        setGifts(data);
+        
+        // Check if current user has a gift (only if user is already loaded)
+        if (currentUser) {
+          const myGiftData = data.find((g: GiftItem) => g.userId === currentUser.id);
+          setIsParticipating(!!myGiftData);
+          setMyGift(myGiftData || null);
+          if (myGiftData) {
+            setFormData({
+              name: myGiftData.name,
+              description: myGiftData.description || '',
+            });
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch gifts', error);
+    }
+  };
+
   useEffect(() => {
     const loadData = async () => {
       // Fetch current user first
