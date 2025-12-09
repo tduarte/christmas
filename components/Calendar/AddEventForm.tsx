@@ -2,6 +2,7 @@
 
 import { Dispatch, FormEvent, SetStateAction } from 'react';
 import { AddEventFormData, CalendarUser } from '@/lib/types/calendar';
+import { X } from 'lucide-react';
 
 interface AddEventFormProps {
   formData: AddEventFormData;
@@ -23,10 +24,24 @@ export default function AddEventForm({
   dates,
 }: AddEventFormProps) {
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-xl border border-slate-200 dark:border-slate-800">
-        <h2 className="text-xl font-bold mb-4 text-slate-900 dark:text-white">Add Event</h2>
-        <form onSubmit={onSubmit} className="space-y-4">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] flex items-end sm:items-center justify-center">
+      <div className="bg-white dark:bg-slate-900 w-full sm:max-w-md sm:rounded-2xl rounded-t-3xl shadow-xl border-slate-200 dark:border-slate-800 sm:border border-t flex flex-col max-h-[95vh] sm:max-h-[90vh]">
+        {/* Header with close button */}
+        <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-800">
+          <h2 className="text-xl font-bold text-slate-900 dark:text-white">Add Event</h2>
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 transition-colors"
+            aria-label="Close"
+          >
+            <X className="w-6 h-6" />
+          </button>
+        </div>
+
+        {/* Scrollable form content */}
+        <form onSubmit={onSubmit} className="flex flex-col flex-1 overflow-hidden">
+          <div className="flex-1 overflow-y-auto p-4 space-y-4">
           <div>
             <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
               Type
@@ -174,23 +189,18 @@ export default function AddEventForm({
               rows={3}
             />
           </div>
+        </div>
 
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 py-2 px-4 rounded-lg border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="flex-1 py-2 px-4 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors"
-            >
-              Add Event
-            </button>
-          </div>
-        </form>
+        {/* Fixed bottom button */}
+        <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+          <button
+            type="submit"
+            className="w-full py-3 px-4 rounded-xl bg-red-600 text-white hover:bg-red-700 transition-colors font-semibold text-base shadow-lg"
+          >
+            Add Event
+          </button>
+        </div>
+      </form>
       </div>
     </div>
   );
