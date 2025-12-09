@@ -96,7 +96,7 @@ export async function POST(req: Request) {
       hostId: session.userId,
       organizerId: organizerId || session.userId,
       imageUrl: null, // Start with null, generate in background
-      type: type as 'dinner' | 'outing',
+      type: type as 'dinner' | 'outing' | 'activity' | 'breakfast' | 'lunch',
     }).returning();
 
     // Auto-add host as confirmed attendee

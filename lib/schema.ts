@@ -11,7 +11,7 @@ export const users = pgTable('users', {
   createdAt: timestamp('created_at').defaultNow(),
 });
 
-export const eventTypeEnum = pgEnum('event_type', ['dinner', 'outing']);
+export const eventTypeEnum = pgEnum('event_type', ['dinner', 'outing', 'activity', 'breakfast', 'lunch']);
 
 export const events = pgTable('events', {
   id: serial('id').primaryKey(),

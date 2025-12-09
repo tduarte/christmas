@@ -30,6 +30,6 @@ export interface AddEventFormData {
   location: string;
   locationUrl: string;
   description: string;
-  type: 'dinner' | 'outing';
+  type: 'dinner' | 'outing' | 'activity' | 'breakfast' | 'lunch';
   organizerId: string;
 }

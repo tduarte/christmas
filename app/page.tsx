@@ -24,7 +24,7 @@ export default function CalendarPage() {
     location: '',
     locationUrl: '',
     description: '',
-    type: 'dinner' as 'dinner' | 'outing',
+    type: 'dinner' as 'dinner' | 'outing' | 'activity' | 'breakfast' | 'lunch',
     organizerId: '', // Will default to current user
   });
 
@@ -172,7 +172,7 @@ export default function CalendarPage() {
 
   return (
     <div className="min-h-screen bg-[var(--background)] dark:bg-[var(--background)] pb-20 transition-colors duration-300">
-      <div className="sticky top-0 z-40 bg-white/90 dark:bg-black/80 backdrop-blur-xl border-b border-black/5 dark:border-white/10 px-5 py-3.5 flex items-center justify-between transition-colors duration-300">
+      <div className="sticky top-0 z-40 bg-white/90 dark:bg-black/80 backdrop-blur-xl border-b border-black/5 dark:border-white/10 px-5 py-3.5 pt-[calc(env(safe-area-inset-top)+0.5rem)] flex items-center justify-between transition-colors duration-300">
         <div>
           <h1 className="text-2xl font-semibold text-neutral-900 dark:text-white leading-snug">🎄 Calendar</h1>
         </div>

@@ -24,7 +24,7 @@ interface EventDetail {
   hostId: number;
   organizerId: number | null;
   imageUrl: string | null;
-  type: 'dinner' | 'outing';
+  type: 'dinner' | 'outing' | 'activity' | 'breakfast' | 'lunch';
   host: {
     id: number;
     name: string;
@@ -58,7 +58,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
     location: '',
     locationUrl: '',
     description: '',
-    type: 'dinner' as 'dinner' | 'outing',
+    type: 'dinner' as 'dinner' | 'outing' | 'activity' | 'breakfast' | 'lunch',
     regenerateImage: false,
     hostId: 0,
   });
@@ -251,6 +251,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
   const attendeeIds = new Set(event.attendees.map(a => a.userId));
   const notResponded = allUsers.filter(u => !attendeeIds.has(u.id));
   const isHost = currentUser && event.hostId === currentUser.id;
+  const canEdit = Boolean(currentUser);
   const dateOptions = event
     ? Array.from({ length: 8 }, (_, i) =>
         format(addDays(parseISO(event.startTime), i - 1), 'yyyy-MM-dd'),
@@ -277,7 +278,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
             <ArrowLeft className="w-5 h-5" />
           </button>
           <h1 className="text-2xl font-semibold text-neutral-900 dark:text-white leading-snug flex-1 text-center">Event</h1>
-          {isHost && (
+          {canEdit && (
             <div className="flex items-center gap-2">
               <button
                 onClick={handleEditClick}
@@ -285,12 +286,14 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
               >
                 <Edit2 className="w-5 h-5" />
               </button>
-              <button
-                onClick={handleDelete}
-                className="p-2 rounded-full bg-neutral-100 dark:bg-neutral-900 border border-black/5 dark:border-white/10 text-neutral-800 dark:text-neutral-100 hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-colors"
-              >
-                <Trash2 className="w-5 h-5" />
-              </button>
+              {isHost && (
+                <button
+                  onClick={handleDelete}
+                  className="p-2 rounded-full bg-neutral-100 dark:bg-neutral-900 border border-black/5 dark:border-white/10 text-neutral-800 dark:text-neutral-100 hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-colors"
+                >
+                  <Trash2 className="w-5 h-5" />
+                </button>
+              )}
             </div>
           )}
         </div>
@@ -316,10 +319,18 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
                   </label>
                   <select
                     value={editFormData.type}
-                    onChange={(e) => setEditFormData({ ...editFormData, type: e.target.value as 'dinner' | 'outing' })}
+                    onChange={(e) =>
+                      setEditFormData({
+                        ...editFormData,
+                        type: e.target.value as 'dinner' | 'outing' | 'activity' | 'breakfast' | 'lunch',
+                      })
+                    }
                     className="w-full rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white p-3 focus:ring-2 focus:ring-neutral-900 dark:focus:ring-white/40 outline-none transition-colors"
                   >
-                    <option value="dinner">Dinner at Home</option>
+                    <option value="breakfast">Breakfast</option>
+                    <option value="lunch">Lunch</option>
+                    <option value="dinner">Dinner</option>
+                    <option value="activity">Activity</option>
                     <option value="outing">Going Out</option>
                   </select>
                 </div>

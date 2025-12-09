@@ -54,10 +54,13 @@ export default function AddEventForm({
             </label>
             <select
               value={formData.type}
-              onChange={(e) => setFormData({ ...formData, type: e.target.value as 'dinner' | 'outing' })}
+              onChange={(e) => setFormData({ ...formData, type: e.target.value as 'dinner' | 'outing' | 'activity' | 'breakfast' | 'lunch' })}
               className="w-full rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white p-3 focus:ring-2 focus:ring-neutral-900 dark:focus:ring-white/40 outline-none transition-colors"
             >
-              <option value="dinner">Dinner at Home</option>
+              <option value="breakfast">Breakfast</option>
+              <option value="lunch">Lunch</option>
+              <option value="dinner">Dinner</option>
+              <option value="activity">Activity</option>
               <option value="outing">Going Out</option>
             </select>
           </div>

@@ -98,20 +98,7 @@ export async function PATCH(
       return NextResponse.json({ error: 'Invalid event ID' }, { status: 400 });
     }
 
-    // Check if user is the host
-    const [existingEvent] = await db
-      .select({ hostId: events.hostId })
-      .from(events)
-      .where(eq(events.id, eventId))
-      .limit(1);
-
-    if (!existingEvent) {
-      return NextResponse.json({ error: 'Event not found' }, { status: 404 });
-    }
-
-    if (existingEvent.hostId !== session.userId) {
-      return NextResponse.json({ error: 'Forbidden: Only the host can edit this event' }, { status: 403 });
-    }
+    // Allow any authenticated user to edit
 
     const body = await req.json();
     const { title, startTime, endTime, location, locationUrl, description, type, organizerId, regenerateImage, hostId } = body;
@@ -128,7 +115,7 @@ export async function PATCH(
       .limit(1);
 
     // Validate host if provided
-    let nextHostId = existingEvent.hostId;
+    let nextHostId = session.userId;
     if (hostId) {
       const parsedHost = parseInt(hostId, 10);
       if (!isNaN(parsedHost)) {
@@ -148,7 +135,7 @@ export async function PATCH(
       locationUrl: locationUrl || null,
       description: description || null,
       organizerId: organizerId || session.userId,
-      type: type as 'dinner' | 'outing',
+      type: type as 'dinner' | 'outing' | 'activity' | 'breakfast' | 'lunch',
       hostId: nextHostId,
     };
 

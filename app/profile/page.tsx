@@ -104,7 +104,7 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-[var(--background)] dark:bg-[var(--background)] pb-20">
-      <div className="sticky top-0 z-10 bg-white/90 dark:bg-black/85 border-b border-black/5 dark:border-white/10 px-5 py-4 flex items-center justify-between backdrop-blur-xl">
+      <div className="sticky top-0 z-10 bg-white/90 dark:bg-black/85 border-b border-black/5 dark:border-white/10 px-5 py-4 pt-[calc(env(safe-area-inset-top)+0.5rem)] flex items-center justify-between backdrop-blur-xl">
         <div>
           <h1 className="text-2xl font-semibold text-neutral-900 dark:text-white leading-snug">🎄 Profile</h1>
         </div>

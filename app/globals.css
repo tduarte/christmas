@@ -26,4 +26,5 @@ body {
   color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
   transition: background-color 0.2s, color 0.2s;
+  padding-bottom: env(safe-area-inset-bottom);
 }
