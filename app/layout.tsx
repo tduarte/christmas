@@ -16,9 +16,12 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Family Christmas",
   description: "Organize family dinners and White Elephant gifts",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://xmas-berndt.vercel.app'),
   openGraph: {
     title: "Family Christmas",
     description: "Organize family dinners and White Elephant gifts",
+    url: "/",
+    siteName: "Family Christmas",
     images: [
       {
         url: "/og-image.png",
@@ -27,6 +30,7 @@ export const metadata: Metadata = {
         alt: "Family Christmas",
       },
     ],
+    locale: "en_US",
     type: "website",
   },
   twitter: {
@@ -34,6 +38,10 @@ export const metadata: Metadata = {
     title: "Family Christmas",
     description: "Organize family dinners and White Elephant gifts",
     images: ["/og-image.png"],
+  },
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/og-image.png",
   },
 };
 
