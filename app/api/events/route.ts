@@ -5,10 +5,6 @@ import { NextResponse } from 'next/server';
 import { eq, and, gte, lte } from 'drizzle-orm';
 import OpenAI from 'openai';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
 export async function GET(req: Request) {
   try {
     const session = await getSession();
@@ -89,6 +85,10 @@ export async function POST(req: Request) {
     // Generate image if not provided (we don't accept image upload yet, so always generate if we can)
     if (process.env.OPENAI_API_KEY) {
       try {
+        const openai = new OpenAI({
+          apiKey: process.env.OPENAI_API_KEY,
+        });
+
         const prompt = `A festive and artistic illustration for a holiday event titled "${title}". ${description ? `Context: ${description}.` : ''} Style: warm, inviting, Christmas-themed.`;
         const response = await openai.images.generate({
           model: "dall-e-3",
