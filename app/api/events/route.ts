@@ -97,10 +97,13 @@ export async function POST(req: Request) {
           size: "1024x1024",
         });
         imageUrl = response.data?.[0]?.url || null;
+        console.log('Generated image URL:', imageUrl);
       } catch (aiError) {
         console.error('Error generating image:', aiError);
         // Continue without image if AI fails
       }
+    } else {
+      console.log('OPENAI_API_KEY not found, skipping image generation');
     }
 
     const [newEvent] = await db.insert(events).values({
