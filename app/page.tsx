@@ -78,7 +78,7 @@ export default function CalendarPage() {
       }
 
       // Fetch events
-      const eventsRes = await fetch('/api/events?startDate=2024-12-20&endDate=2024-12-30');
+      const eventsRes = await fetch('/api/events?startDate=2024-12-20&endDate=2024-12-27');
       if (eventsRes.ok) {
         setEvents(await eventsRes.json());
       }
@@ -157,9 +157,9 @@ export default function CalendarPage() {
     return acc;
   }, {} as Record<string, Event[]>);
 
-  // Generate dates Dec 20-30
+  // Generate dates Dec 20-27
   const dates = [];
-  for (let i = 20; i <= 30; i++) {
+  for (let i = 20; i <= 27; i++) {
     dates.push(`2024-12-${i.toString().padStart(2, '0')}`);
   }
 
