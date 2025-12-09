@@ -265,134 +265,132 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
         </div>
 
       {showEditForm && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-neutral-950 rounded-3xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-black/5 dark:border-white/10">
-            <div className="flex items-center justify-between mb-4">
+        <div className="fixed inset-0 bg-black/50 z-[60] flex items-end sm:items-center justify-center overflow-hidden p-0 sm:p-4">
+          <div className="bg-white dark:bg-neutral-950 w-full h-full sm:h-auto sm:max-w-md sm:rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-black/5 dark:border-white/10 flex flex-col sm:max-h-[90vh] overflow-hidden">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-black/5 dark:border-white/10">
               <h2 className="text-xl font-semibold text-neutral-900 dark:text-white">Edit Event</h2>
               <button
                 onClick={() => setShowEditForm(false)}
-                className="text-sm text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-white"
+                className="p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-900 text-neutral-600 dark:text-neutral-300"
+                aria-label="Close"
               >
-                Close
+                ✕
               </button>
             </div>
-            <form onSubmit={handleEditSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-200 mb-1">
-                  Type
-                </label>
-                <select
-                  value={editFormData.type}
-                  onChange={(e) => setEditFormData({ ...editFormData, type: e.target.value as 'dinner' | 'outing' })}
-                  className="w-full rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white p-3 focus:ring-2 focus:ring-neutral-900 dark:focus:ring-white/40 outline-none transition-colors"
-                >
-                  <option value="dinner">Dinner at Home</option>
-                  <option value="outing">Going Out</option>
-                </select>
+            <form onSubmit={handleEditSubmit} className="flex flex-col flex-1 overflow-hidden">
+              <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4 overscroll-contain" style={{ WebkitOverflowScrolling: 'touch' }}>
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-200 mb-1">
+                    Type
+                  </label>
+                  <select
+                    value={editFormData.type}
+                    onChange={(e) => setEditFormData({ ...editFormData, type: e.target.value as 'dinner' | 'outing' })}
+                    className="w-full rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white p-3 focus:ring-2 focus:ring-neutral-900 dark:focus:ring-white/40 outline-none transition-colors"
+                  >
+                    <option value="dinner">Dinner at Home</option>
+                    <option value="outing">Going Out</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-200 mb-1">
+                    Title
+                  </label>
+                  <input
+                    type="text"
+                    value={editFormData.title}
+                    onChange={(e) => setEditFormData({ ...editFormData, title: e.target.value })}
+                    className="w-full rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white p-3 focus:ring-2 focus:ring-neutral-900 dark:focus:ring-white/40 outline-none"
+                    required
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-200 mb-1">
+                      Start Time
+                    </label>
+                    <input
+                      type="datetime-local"
+                      value={editFormData.startTime}
+                      onChange={(e) => setEditFormData({ ...editFormData, startTime: e.target.value })}
+                      step="1800"
+                      className="w-full rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white p-3 focus:ring-2 focus:ring-neutral-900 dark:focus:ring-white/40 outline-none"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-200 mb-1">
+                      End Time (optional)
+                    </label>
+                    <input
+                      type="datetime-local"
+                      value={editFormData.endTime}
+                      onChange={(e) => setEditFormData({ ...editFormData, endTime: e.target.value })}
+                      step="1800"
+                      className="w-full rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white p-3 focus:ring-2 focus:ring-neutral-900 dark:focus:ring-white/40 outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-200 mb-1">
+                    Location
+                  </label>
+                  <input
+                    type="text"
+                    value={editFormData.location}
+                    onChange={(e) => setEditFormData({ ...editFormData, location: e.target.value })}
+                    className="w-full rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white p-3 focus:ring-2 focus:ring-neutral-900 dark:focus:ring-white/40 outline-none"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-200 mb-1">
+                    Location URL (Google Maps/Yelp)
+                  </label>
+                  <input
+                    type="url"
+                    value={editFormData.locationUrl}
+                    onChange={(e) => setEditFormData({ ...editFormData, locationUrl: e.target.value })}
+                    className="w-full rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white p-3 focus:ring-2 focus:ring-neutral-900 dark:focus:ring-white/40 outline-none"
+                    placeholder="https://..."
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-200 mb-1">
+                    Description (optional)
+                  </label>
+                  <textarea
+                    value={editFormData.description}
+                    onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
+                    className="w-full rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white p-3 focus:ring-2 focus:ring-neutral-900 dark:focus:ring-white/40 outline-none"
+                    rows={3}
+                  />
+                </div>
+
+                <div className="flex items-center gap-2 p-3 bg-neutral-100/80 dark:bg-neutral-900/60 rounded-xl border border-black/5 dark:border-white/5">
+                  <input
+                    type="checkbox"
+                    id="regenerateImage"
+                    checked={editFormData.regenerateImage}
+                    onChange={(e) => setEditFormData({ ...editFormData, regenerateImage: e.target.checked })}
+                    className="w-4 h-4 text-neutral-900 bg-white border-black/10 rounded focus:ring-neutral-900 dark:focus:ring-white/40 dark:bg-neutral-900 dark:border-white/20 focus:ring-2"
+                  />
+                  <label htmlFor="regenerateImage" className="text-sm text-neutral-700 dark:text-neutral-200">
+                    Regenerate AI image (takes ~10-15 seconds)
+                  </label>
+                </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-200 mb-1">
-                  Title
-                </label>
-                <input
-                  type="text"
-                  value={editFormData.title}
-                  onChange={(e) => setEditFormData({ ...editFormData, title: e.target.value })}
-                  className="w-full rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white p-3 focus:ring-2 focus:ring-neutral-900 dark:focus:ring-white/40 outline-none"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-200 mb-1">
-                  Start Time
-                </label>
-                <input
-                  type="datetime-local"
-                  value={editFormData.startTime}
-                  onChange={(e) => setEditFormData({ ...editFormData, startTime: e.target.value })}
-                  step="1800"
-                  className="w-full rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white p-3 focus:ring-2 focus:ring-neutral-900 dark:focus:ring-white/40 outline-none"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-200 mb-1">
-                  End Time (optional)
-                </label>
-                <input
-                  type="datetime-local"
-                  value={editFormData.endTime}
-                  onChange={(e) => setEditFormData({ ...editFormData, endTime: e.target.value })}
-                  step="1800"
-                  className="w-full rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white p-3 focus:ring-2 focus:ring-neutral-900 dark:focus:ring-white/40 outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-200 mb-1">
-                  Location
-                </label>
-                <input
-                  type="text"
-                  value={editFormData.location}
-                  onChange={(e) => setEditFormData({ ...editFormData, location: e.target.value })}
-                  className="w-full rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white p-3 focus:ring-2 focus:ring-neutral-900 dark:focus:ring-white/40 outline-none"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-200 mb-1">
-                  Location URL (Google Maps/Yelp)
-                </label>
-                <input
-                  type="url"
-                  value={editFormData.locationUrl}
-                  onChange={(e) => setEditFormData({ ...editFormData, locationUrl: e.target.value })}
-                  className="w-full rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white p-3 focus:ring-2 focus:ring-neutral-900 dark:focus:ring-white/40 outline-none"
-                  placeholder="https://..."
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-200 mb-1">
-                  Description (optional)
-                </label>
-                <textarea
-                  value={editFormData.description}
-                  onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
-                  className="w-full rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white p-3 focus:ring-2 focus:ring-neutral-900 dark:focus:ring-white/40 outline-none"
-                  rows={3}
-                />
-              </div>
-
-              <div className="flex items-center gap-2 p-3 bg-neutral-100/80 dark:bg-neutral-900/60 rounded-xl border border-black/5 dark:border-white/5">
-                <input
-                  type="checkbox"
-                  id="regenerateImage"
-                  checked={editFormData.regenerateImage}
-                  onChange={(e) => setEditFormData({ ...editFormData, regenerateImage: e.target.checked })}
-                  className="w-4 h-4 text-neutral-900 bg-white border-black/10 rounded focus:ring-neutral-900 dark:focus:ring-white/40 dark:bg-neutral-900 dark:border-white/20 focus:ring-2"
-                />
-                <label htmlFor="regenerateImage" className="text-sm text-neutral-700 dark:text-neutral-200">
-                  Regenerate AI image (takes ~10-15 seconds)
-                </label>
-              </div>
-
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => setShowEditForm(false)}
-                  className="flex-1 py-2.5 px-4 rounded-xl border border-black/10 dark:border-white/10 text-neutral-700 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-neutral-900"
-                >
-                  Cancel
-                </button>
+              <div className="p-5 pb-7 border-t border-black/5 dark:border-white/10 bg-white/90 dark:bg-neutral-950/90 backdrop-blur-md safe-area-inset-bottom">
                 <button
                   type="submit"
-                  className="flex-1 py-2.5 px-4 rounded-xl bg-neutral-900 text-white hover:bg-neutral-800 transition-colors"
+                  className="w-full py-3.5 px-4 rounded-2xl bg-[#34C759] text-black hover:bg-[#2EC254] dark:bg-[#30D158] dark:hover:bg-[#2BC451] transition-colors font-semibold text-base shadow-lg shadow-black/10"
                 >
                   Save Changes
                 </button>
