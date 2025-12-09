@@ -77,17 +77,6 @@ export default function CalendarPage() {
         setFormData(prev => ({ ...prev, organizerId: userData.id.toString() }));
       }
 
-      // Fetch all users for organizer dropdown
-      // We don't have a dedicated "list users" endpoint yet, but we can assume we might need one.
-      // Or we can just fetch gifts endpoint which returns users info? No, that's hacky.
-      // Let's assume we need to create one or just use what we have.
-      // Actually, we don't have a public endpoint to list all users. 
-      // I'll create a simple fetch for the form logic or assume I can get it.
-      // Let's skip fetching all users for now and just handle the current user, 
-      // BUT the requirement says "Organizer in case is not yourself".
-      // I'll assume we can create an endpoint or reuse logic.
-      // For now, I'll fetch events and current user.
-      
       // Fetch events
       const eventsRes = await fetch('/api/events?startDate=2024-12-20&endDate=2024-12-30');
       if (eventsRes.ok) {
@@ -100,19 +89,7 @@ export default function CalendarPage() {
     }
   };
 
-  // We need to fetch all users for the organizer dropdown
-  // Since we don't have a direct endpoint, I'll add a quick fetch here assuming we'll add the endpoint later or modify an existing one.
-  // Actually, I should probably add the endpoint. But for now, let's proceed.
-  // Wait, I can't select other users if I don't have them. 
-  // I will assume I need to fetch them. I'll add a call to /api/users (plural) if it existed.
-  // Since it doesn't, I'll add a TODO or just fetch from /api/attendees if possible? No.
-  // Let's implement a quick user list fetch inside the component if the user opens the form?
-  // I'll fetch users when the form opens.
-
   const fetchUsers = async () => {
-    // This endpoint doesn't exist yet, I'll need to create it or similar.
-    // For this plan, I'll create a minimal route in `app/api/users/route.ts` later or now.
-    // I'll just use a placeholder for now and implement the endpoint in the next step or same step.
     try {
         const res = await fetch('/api/users'); 
         if (res.ok) {
@@ -195,34 +172,34 @@ export default function CalendarPage() {
   };
 
   return (
-    <div className="min-h-screen pb-20">
-      <div className="header-bg sticky top-0 z-10 border-b border-gray-700/50 px-4 py-4 flex items-center justify-between shadow-lg">
-        <h1 className="text-2xl font-bold text-white">🎄 Calendar</h1>
-        <div className="flex items-center gap-3">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-20 transition-colors duration-300">
+      <div className="sticky top-0 z-10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 py-3 flex items-center justify-between transition-colors duration-300">
+        <h1 className="text-xl font-bold text-slate-900 dark:text-white">Calendar</h1>
+        <div className="flex items-center gap-2">
           <ThemeToggle />
           <button
             onClick={() => setShowAddForm(!showAddForm)}
-            className="p-2.5 rounded-xl bg-red-600 text-white hover:bg-red-700 transition-all shadow-lg hover:shadow-red-600/50 hover:scale-105"
+            className="p-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors shadow-sm"
           >
-            <Plus className="w-6 h-6" />
+            <Plus className="w-5 h-5" />
           </button>
         </div>
       </div>
 
       {showAddForm && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="card-bg rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl">
-            <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">✨ Add Event</h2>
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-xl border border-slate-200 dark:border-slate-800">
+            <h2 className="text-xl font-bold mb-4 text-slate-900 dark:text-white">Add Event</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Type Selection */}
                <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                   Type
                 </label>
                 <select
                   value={formData.type}
                   onChange={(e) => setFormData({ ...formData, type: e.target.value as 'dinner' | 'outing' })}
-                  className="w-full rounded-xl border p-3 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
+                  className="w-full rounded-lg border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white border p-2 focus:ring-2 focus:ring-red-500 outline-none transition-colors"
                 >
                   <option value="dinner">Dinner at Home</option>
                   <option value="outing">Going Out</option>
@@ -231,21 +208,21 @@ export default function CalendarPage() {
 
               {/* Title */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                   Title
                 </label>
                 <input
                   type="text"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full rounded-xl border p-3 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
+                  className="w-full rounded-lg border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white border p-2 focus:ring-2 focus:ring-red-500 outline-none transition-colors"
                   required
                 />
               </div>
 
               {/* Date Selection Buttons */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                   Date
                 </label>
                 <div className="grid grid-cols-4 gap-2">
@@ -257,10 +234,10 @@ export default function CalendarPage() {
                           key={date}
                           type="button"
                           onClick={() => setFormData({ ...formData, selectedDate: date })}
-                          className={`p-2.5 text-sm font-medium rounded-xl border transition-all ${
+                          className={`p-2 text-sm rounded-lg border transition-all ${
                             isSelected 
-                              ? 'bg-red-600 text-white border-red-600 shadow-lg shadow-red-600/30 scale-105' 
-                              : 'bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 hover:border-red-400'
+                              ? 'bg-red-600 text-white border-red-600 shadow-sm' 
+                              : 'bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700'
                           }`}
                         >
                           Dec {day}
@@ -273,53 +250,53 @@ export default function CalendarPage() {
               {/* Time Selection */}
               <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                       Start Time
                     </label>
                     <input
                       type="time"
                       value={formData.startTime}
                       onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
-                      className="w-full rounded-xl border p-3 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
+                      className="w-full rounded-lg border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white border p-2 focus:ring-2 focus:ring-red-500 outline-none transition-colors"
                       required
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                       End Time
                     </label>
                     <input
                       type="time"
                       value={formData.endTime}
                       onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
-                      className="w-full rounded-xl border p-3 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
+                      className="w-full rounded-lg border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white border p-2 focus:ring-2 focus:ring-red-500 outline-none transition-colors"
                     />
                   </div>
               </div>
 
               {/* Location */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                   Location
                 </label>
                 <input
                   type="text"
                   value={formData.location}
                   onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                  className="w-full rounded-xl border p-3 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
+                  className="w-full rounded-lg border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white border p-2 focus:ring-2 focus:ring-red-500 outline-none transition-colors"
                   required
                 />
               </div>
 
               {/* Organizer Selection */}
                <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                   Organizer
                 </label>
                 <select
                   value={formData.organizerId}
                   onChange={(e) => setFormData({ ...formData, organizerId: e.target.value })}
-                  className="w-full rounded-xl border p-3 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
+                  className="w-full rounded-lg border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white border p-2 focus:ring-2 focus:ring-red-500 outline-none transition-colors"
                 >
                   {users.length === 0 && <option value={currentUser?.id}>{currentUser?.name} (You)</option>}
                   {users.map(user => (
@@ -332,30 +309,30 @@ export default function CalendarPage() {
 
               {/* Description */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                   Description (optional)
                 </label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full rounded-xl border p-3 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
+                  className="w-full rounded-lg border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white border p-2 focus:ring-2 focus:ring-red-500 outline-none transition-colors"
                   rows={3}
                 />
               </div>
 
-              <div className="flex gap-3 pt-2">
+              <div className="flex gap-2">
                 <button
                   type="button"
                   onClick={() => setShowAddForm(false)}
-                  className="flex-1 py-3 px-4 rounded-xl border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all font-medium"
+                  className="flex-1 py-2 px-4 rounded-lg border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-3 px-4 rounded-xl bg-red-600 text-white hover:bg-red-700 transition-all font-semibold shadow-lg hover:shadow-red-600/50 hover:scale-[1.02]"
+                  className="flex-1 py-2 px-4 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors"
                 >
-                  ✨ Add Event
+                  Add Event
                 </button>
               </div>
             </form>
@@ -363,52 +340,48 @@ export default function CalendarPage() {
         </div>
       )}
 
-      <div className="p-4 space-y-8 max-w-2xl mx-auto">
+      <div className="p-4 space-y-6">
         {loading ? (
-          <div className="text-center py-12">
-            <div className="inline-block w-8 h-8 border-4 border-red-600 border-t-transparent rounded-full animate-spin"></div>
-            <p className="mt-4 text-gray-600 dark:text-gray-400">Loading events...</p>
-          </div>
+          <div className="text-center py-12 text-slate-400">Loading events...</div>
         ) : dates.length === 0 ? (
-          <div className="text-center py-12 text-gray-500 dark:text-gray-400">No events scheduled</div>
+          <div className="text-center py-12 text-slate-400">No events scheduled</div>
         ) : (
           dates.map((date) => {
             const dayEvents = groupedEvents[date] || [];
             return (
-              <div key={date} className="space-y-3">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white sticky top-[72px] py-3 z-[5]" style={{ background: 'var(--background)' }}>
+              <div key={date} className="space-y-2">
+                <h2 className="text-lg font-semibold text-slate-900 dark:text-white sticky top-16 bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur-sm py-2 z-[5]">
                   {formatDate(date)}
                 </h2>
                 {dayEvents.length === 0 ? (
-                  <div className="text-sm text-gray-500 dark:text-gray-400 py-4 pl-2">No events</div>
+                  <div className="text-sm text-slate-400 dark:text-slate-500 py-4">No events</div>
                 ) : (
                   <div className="space-y-4">
                     {dayEvents.map((event) => (
                       <Link
                         key={event.id}
                         href={`/events/${event.id}`}
-                        className="group card-bg rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border hover:scale-[1.02] hover:border-red-400 dark:hover:border-red-600"
+                        className="group block bg-white dark:bg-slate-900 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-slate-200 dark:border-slate-800 hover:scale-[1.02] hover:border-red-200 dark:hover:border-red-900/30"
                       >
                         {/* Thumbnail on top */}
-                        <div className="w-full h-48 relative overflow-hidden bg-gradient-to-br from-red-50 to-green-50 dark:from-gray-900 dark:to-gray-800">
+                        <div className="w-full h-48 relative overflow-hidden bg-slate-100 dark:bg-slate-800">
                           {event.imageUrl ? (
                             <img 
                               src={event.imageUrl} 
                               alt={event.title}
-                              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                             />
                           ) : (
-                            <div className="w-full h-full bg-gradient-to-br from-red-100 via-green-100 to-red-100 dark:from-red-900/20 dark:via-green-900/20 dark:to-red-900/20 animate-pulse flex items-center justify-center">
+                            <div className="w-full h-full bg-gradient-to-br from-red-50 via-slate-50 to-red-50 dark:from-slate-800 dark:via-slate-900 dark:to-slate-800 animate-pulse flex items-center justify-center">
                               <div className="text-center">
-                                <div className="w-12 h-12 border-4 border-red-600 dark:border-red-400 border-t-transparent rounded-full animate-spin mx-auto"></div>
-                                <p className="text-sm font-medium text-red-700 dark:text-red-300 mt-3">Generating image...</p>
-                                <p className="text-xs text-red-600/60 dark:text-red-400/60 mt-1">~10-15 seconds</p>
+                                <div className="w-10 h-10 border-3 border-red-500 dark:border-red-400 border-t-transparent rounded-full animate-spin mx-auto"></div>
+                                <p className="text-sm font-medium text-slate-600 dark:text-slate-400 mt-3">Creating magic...</p>
                               </div>
                             </div>
                           )}
                           {/* Event type badge overlay */}
-                          <div className="absolute top-3 right-3">
-                            <span className={`px-3 py-1.5 rounded-full text-xs font-semibold shadow-lg backdrop-blur-sm ${
+                          <div className="absolute top-3 right-3 z-10">
+                            <span className={`px-3 py-1.5 rounded-full text-xs font-bold shadow-lg backdrop-blur-md border border-white/10 ${
                               event.type === 'dinner' 
                                 ? 'bg-red-500/90 text-white' 
                                 : 'bg-blue-500/90 text-white'
@@ -416,37 +389,48 @@ export default function CalendarPage() {
                               {event.type === 'dinner' ? '🍽️ Dinner' : '🎉 Outing'}
                             </span>
                           </div>
+                          
+                          {/* Gradient overlay for text legibility if we wanted text on image, but we don't right now */}
                         </div>
 
                         {/* Card content */}
                         <div className="p-5">
-                          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 line-clamp-1">
+                          <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4 line-clamp-1 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
                             {event.title}
                           </h3>
                           
-                          <div className="space-y-2.5">
-                            <div className="flex items-center gap-2.5 text-gray-700 dark:text-gray-300">
-                              <Clock className="w-5 h-5" />
+                          <div className="space-y-3">
+                            <div className="flex items-center gap-3 text-slate-600 dark:text-slate-400">
+                              <div className="p-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+                                <Clock className="w-4 h-4" />
+                              </div>
                               <span className="text-sm font-medium">
                                 {formatTime(event.startTime)}
                                 {event.endTime && ` - ${formatTime(event.endTime)}`}
                               </span>
                             </div>
                             
-                            <div className="flex items-center gap-2.5 text-gray-700 dark:text-gray-300">
-                              <MapPin className="w-5 h-5" />
+                            <div className="flex items-center gap-3 text-slate-600 dark:text-slate-400">
+                              <div className="p-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+                                <MapPin className="w-4 h-4" />
+                              </div>
                               <span className="text-sm font-medium line-clamp-1">{event.location}</span>
                             </div>
                             
-                            <div className="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-gray-700">
+                            <div className="pt-4 mt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
                               <div className="flex items-center gap-2">
-                                <Users className="w-5 h-5 text-gray-700 dark:text-gray-300" />
-                                <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                                  {event.confirmedCount} confirmed
+                                <div className="flex -space-x-2">
+                                  {/* Fake avatars for now since we don't have user images */}
+                                  <div className="w-6 h-6 rounded-full bg-red-100 dark:bg-red-900/50 border-2 border-white dark:border-slate-900 flex items-center justify-center text-[10px] text-red-700 dark:text-red-300 font-bold">
+                                    {event.confirmedCount}
+                                  </div>
+                                </div>
+                                <span className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                                  confirmed
                                 </span>
                               </div>
-                              <div className="text-red-600 dark:text-red-400 group-hover:translate-x-1 transition-transform">
-                                <span className="text-sm font-medium">View →</span>
+                              <div className="flex items-center gap-1 text-red-600 dark:text-red-400 text-sm font-semibold group-hover:gap-2 transition-all">
+                                Details <span className="text-lg leading-none">→</span>
                               </div>
                             </div>
                           </div>
