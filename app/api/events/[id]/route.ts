@@ -181,7 +181,7 @@ export async function PATCH(
                 The style must be Japanese Anime. Make it atmospheric, detailed, and strongly emphasize the Christmas vibe.`
               }
             ],
-            max_tokens: 200,
+            max_completion_tokens: 200,
           });
 
           const generatedPrompt = promptGenerationResponse.choices[0].message.content || `A Christmas-themed illustration for ${eventTypeText} titled "${title}" at ${location} in Japanese Anime style.`;
