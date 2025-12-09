@@ -5,6 +5,8 @@
 :root {
   --background: #ffffff;
   --foreground: #0f172a;
+  --font-geist-sans: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-geist-mono: "SFMono-Regular", Menlo, Consolas, monospace;
 }
 
 @theme inline {
