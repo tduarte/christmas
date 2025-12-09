@@ -90,7 +90,7 @@ export default function AddEventForm({
                     onClick={() => setFormData({ ...formData, selectedDate: date })}
                     className={`p-2.5 text-sm rounded-xl border transition-all ${
                       isSelected
-                        ? 'bg-neutral-900 text-white border-neutral-900 shadow-sm'
+                        ? 'bg-neutral-900 text-white border-neutral-900 shadow-sm dark:bg-white dark:text-black dark:border-white'
                         : 'bg-white dark:bg-neutral-900 border-black/10 dark:border-white/10 text-neutral-800 dark:text-neutral-100 hover:bg-neutral-50 dark:hover:bg-neutral-800'
                     }`}
                   >

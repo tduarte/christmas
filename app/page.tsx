@@ -162,6 +162,14 @@ export default function CalendarPage() {
     return format(parseISO(dateString), 'EEEE, MMMM d');
   };
 
+  const openAddForm = (date?: string) => {
+    setFormData(prev => ({
+      ...prev,
+      selectedDate: date ?? prev.selectedDate,
+    }));
+    setShowAddForm(true);
+  };
+
   return (
     <div className="min-h-screen bg-[var(--background)] dark:bg-[var(--background)] pb-20 transition-colors duration-300">
       <div className="sticky top-0 z-40 bg-white/90 dark:bg-black/80 backdrop-blur-xl border-b border-black/5 dark:border-white/10 px-5 py-3.5 flex items-center justify-between transition-colors duration-300">
@@ -170,7 +178,7 @@ export default function CalendarPage() {
         </div>
         <div className="flex items-center gap-2">
           <button
-            onClick={() => setShowAddForm(!showAddForm)}
+            onClick={() => openAddForm()}
             className="p-2.5 rounded-full bg-neutral-900 text-white hover:bg-neutral-800 active:scale-95 transition-all shadow-sm"
             aria-label="Add event"
           >
@@ -201,11 +209,24 @@ export default function CalendarPage() {
             const dayEvents = groupedEvents[date] || [];
             return (
               <div key={date} className="space-y-2">
-                <h2 className="text-base font-semibold text-neutral-900 dark:text-white sticky top-[64px] bg-[var(--background)]/95 dark:bg-[var(--background)]/95 backdrop-blur-sm py-2 -mx-5 px-5 z-30">
-                  {formatDate(date)}
-                </h2>
+                <div className="sticky top-[64px] bg-[var(--background)]/95 dark:bg-[var(--background)]/95 backdrop-blur-sm py-3 -mx-5 px-5 z-30">
+                  <p className="text-xs uppercase tracking-[0.08em] text-neutral-500 dark:text-neutral-400">
+                    {format(parseISO(date), 'MMMM d')}
+                  </p>
+                  <h2 className="text-base font-semibold text-neutral-900 dark:text-white">
+                    {format(parseISO(date), 'EEEE')}
+                  </h2>
+                </div>
                 {dayEvents.length === 0 ? (
-                  <div className="text-sm text-neutral-400 dark:text-neutral-500 py-4">No events</div>
+                  <div className="flex flex-col items-center gap-2 py-4">
+                    <span className="text-sm text-neutral-500 dark:text-neutral-400">No events</span>
+                    <button
+                      onClick={() => openAddForm(date)}
+                      className="text-xs font-semibold text-neutral-900 dark:text-white px-3 py-1.5 rounded-full border border-black/10 dark:border-white/20 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+                    >
+                      Add event
+                    </button>
+                  </div>
                 ) : (
                   <div className="space-y-4">
                     {dayEvents.map((event) => (
