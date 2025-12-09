@@ -7,7 +7,8 @@ import { Sparkles } from 'lucide-react';
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [isRegister, setIsRegister] = useState(false);
+  const mode = searchParams.get('mode');
+  const [isRegister, setIsRegister] = useState(mode === 'register');
   const [email, setEmail] = useState('');
   const [pin, setPin] = useState('');
   const [name, setName] = useState('');
@@ -64,28 +65,9 @@ function LoginForm() {
         </div>
 
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
-          <div className="flex gap-2 mb-6">
-            <button
-              onClick={() => setIsRegister(false)}
-              className={`flex-1 py-2 px-4 rounded-lg font-medium transition-colors ${
-                !isRegister
-                  ? 'bg-red-600 text-white'
-                  : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
-              }`}
-            >
-              Login
-            </button>
-            <button
-              onClick={() => setIsRegister(true)}
-              className={`flex-1 py-2 px-4 rounded-lg font-medium transition-colors ${
-                isRegister
-                  ? 'bg-red-600 text-white'
-                  : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
-              }`}
-            >
-              Register
-            </button>
-          </div>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+            {isRegister ? 'Create Account' : 'Welcome Back'}
+          </h2>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {isRegister && (
@@ -149,8 +131,34 @@ function LoginForm() {
               disabled={loading}
               className="w-full bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-medium py-3 rounded-lg transition-colors shadow-sm"
             >
-              {loading ? 'Please wait...' : isRegister ? 'Register' : 'Login'}
+              {loading ? 'Please wait...' : isRegister ? 'Create Account' : 'Sign In'}
             </button>
+
+            <div className="mt-4 text-center">
+              {isRegister ? (
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Already have an account?{' '}
+                  <button
+                    type="button"
+                    onClick={() => setIsRegister(false)}
+                    className="text-red-600 dark:text-red-400 font-medium hover:underline"
+                  >
+                    Sign in
+                  </button>
+                </p>
+              ) : (
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Don't have an account?{' '}
+                  <button
+                    type="button"
+                    onClick={() => setIsRegister(true)}
+                    className="text-red-600 dark:text-red-400 font-medium hover:underline"
+                  >
+                    Create one
+                  </button>
+                </p>
+              )}
+            </div>
           </form>
         </div>
       </div>
