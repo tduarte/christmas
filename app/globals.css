@@ -60,7 +60,7 @@ body {
 }
 
 .rbc-event {
-  @apply bg-transparent p-0 border-0 rounded-md shadow-none outline-none focus:outline-none !important;
+  @apply bg-transparent p-0 border-0 rounded-md shadow-none outline-none focus:outline-none;
 }
 
 /* Today highlight */

@@ -1,5 +1,10 @@
 'use client';
 
+import { useState, useEffect } from 'react';
+import { format, parseISO } from 'date-fns';
+import { Plus } from 'lucide-react';
+import BottomNav from '@/components/BottomNav';
+import ThemeToggle from '@/components/ThemeToggle';
 import CalendarView from '@/components/CalendarView';
 import { useRouter } from 'next/navigation';
 

@@ -3,7 +3,7 @@
 import { Calendar, dateFnsLocalizer, Views } from 'react-big-calendar';
 import withDragAndDrop, { withDragAndDropProps } from 'react-big-calendar/lib/addons/dragAndDrop';
 import { format, parse, startOfWeek, getDay, parseISO } from 'date-fns';
-import enUS from 'date-fns/locale/en-US';
+import { enUS } from 'date-fns/locale';
 import { useState, useCallback, useEffect } from 'react';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
