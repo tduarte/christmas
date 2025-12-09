@@ -9,6 +9,16 @@ interface EventCardProps {
   formatTime: (timeString: string) => string;
 }
 
+const initials = (name?: string) => {
+  if (!name) return '??';
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return '??';
+  if (parts.length === 1) return (parts[0][0] || '').toUpperCase();
+  const first = parts[0][0] || '';
+  const last = parts[parts.length - 1][0] || '';
+  return (first + last).toUpperCase();
+};
+
 export default function EventCard({ event, formatTime }: EventCardProps) {
   return (
     <Link
@@ -66,6 +76,15 @@ export default function EventCard({ event, formatTime }: EventCardProps) {
               <MapPin className="w-4 h-4" />
             </div>
             <span className="text-sm font-medium text-neutral-900 dark:text-neutral-100 line-clamp-1">{event.location}</span>
+          </div>
+
+          <div className="flex items-center gap-3 text-neutral-600 dark:text-neutral-400">
+            <div className="p-2 rounded-full bg-neutral-100 dark:bg-neutral-900 text-neutral-600 dark:text-neutral-300 border border-black/5 dark:border-white/5">
+              <div className="w-4 h-4 flex items-center justify-center text-[10px] font-bold">{initials(event.hostName)}</div>
+            </div>
+            <div className="text-sm font-medium text-neutral-900 dark:text-neutral-100 line-clamp-1">
+              {event.hostName || 'TBD'}
+            </div>
           </div>
 
           <div className="pt-4 mt-1 border-t border-neutral-100 dark:border-neutral-800 flex items-center justify-between">

@@ -17,6 +17,7 @@ export async function GET() {
       email: users.email,
       name: users.name,
       themePreference: users.themePreference,
+      avatarUrl: users.avatarUrl,
     })
     .from(users)
     .where(eq(users.id, session.userId))
@@ -27,6 +28,7 @@ export async function GET() {
     email: user?.email ?? session.email,
     name: user?.name ?? session.name,
     themePreference: user?.themePreference ?? 'system',
+    avatarUrl: user?.avatarUrl ?? null,
   });
 }
 
@@ -36,16 +38,19 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const { themePreference } = await request.json();
+  const { themePreference, avatarUrl } = await request.json();
   const allowed = ['light', 'dark', 'system'];
-  if (!allowed.includes(themePreference)) {
+  if (themePreference && !allowed.includes(themePreference)) {
     return NextResponse.json({ error: 'Invalid theme preference' }, { status: 400 });
   }
 
   await db
     .update(users)
-    .set({ themePreference })
+    .set({
+      ...(themePreference ? { themePreference } : {}),
+      ...(avatarUrl !== undefined ? { avatarUrl } : {}),
+    })
     .where(eq(users.id, session.userId));
 
-  return NextResponse.json({ ok: true, themePreference });
+  return NextResponse.json({ ok: true, themePreference, avatarUrl });
 }

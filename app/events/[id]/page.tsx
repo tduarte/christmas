@@ -10,6 +10,7 @@ interface MinimalUser {
   id: number;
   name: string;
   email: string;
+  avatarUrl?: string | null;
 }
 
 interface EventDetail {
@@ -28,6 +29,7 @@ interface EventDetail {
     id: number;
     name: string;
     email: string;
+    avatarUrl?: string | null;
   };
   attendees: Array<{
     id: number;
@@ -35,6 +37,7 @@ interface EventDetail {
     status: 'confirmed' | 'maybe' | 'no';
     userName: string;
     userEmail: string;
+    userAvatarUrl?: string | null;
   }>;
 }
 
@@ -253,6 +256,16 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
         format(addDays(parseISO(event.startTime), i - 1), 'yyyy-MM-dd'),
       )
     : [];
+
+  const initials = (name?: string) => {
+    if (!name) return '??';
+    const parts = name.trim().split(/\s+/).filter(Boolean);
+    if (parts.length === 0) return '??';
+    if (parts.length === 1) return (parts[0][0] || '').toUpperCase();
+    const first = parts[0][0] || '';
+    const last = parts[parts.length - 1][0] || '';
+    return (first + last).toUpperCase();
+  };
 
   return (
     <div className="min-h-screen bg-[var(--background)] dark:bg-[var(--background)] pb-20">
@@ -529,11 +542,25 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
               </div>
             )}
 
-            <div className="pt-2 border-t border-black/5 dark:border-white/10">
-              <div className="text-sm">
-                <span className="text-neutral-500 dark:text-neutral-400">Hosted by </span>
-                <span className="font-semibold text-neutral-900 dark:text-white">{event.host.name}</span>
+            <div className="pt-2 border-t border-black/5 dark:border-white/10 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full border border-black/5 dark:border-white/10 bg-neutral-200 dark:bg-neutral-800 overflow-hidden flex items-center justify-center text-xs font-semibold text-neutral-800 dark:text-neutral-200">
+                  {event.host.avatarUrl ? (
+                    <img src={event.host.avatarUrl} alt={event.host.name} className="w-full h-full object-cover" />
+                  ) : (
+                    event.host.name
+                      .split(' ')
+                      .map((n) => n[0])
+                      .join('')
+                      .toUpperCase()
+                  )}
+                </div>
+                <div className="text-sm">
+                  <span className="block font-semibold text-neutral-900 dark:text-white">{event.host.name}</span>
+                  <span className="text-neutral-500 dark:text-neutral-400">Host</span>
+                </div>
               </div>
+              <Users className="w-5 h-5 text-neutral-500 dark:text-neutral-400" />
             </div>
           </div>
         </div>
@@ -589,10 +616,19 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
               {confirmedAttendees.map((attendee) => (
                 <div
                   key={attendee.id}
-                  className="flex items-center gap-2 p-2.5 rounded-2xl bg-neutral-100/80 dark:bg-neutral-900/70 border border-black/5 dark:border-white/10"
+                  className="flex items-center justify-between gap-2 p-2.5 rounded-2xl bg-neutral-100/80 dark:bg-neutral-900/70 border border-black/5 dark:border-white/10"
                 >
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full border border-black/5 dark:border-white/10 bg-neutral-200 dark:bg-neutral-800 overflow-hidden flex items-center justify-center text-xs font-semibold text-neutral-800 dark:text-neutral-200">
+                      {attendee.userAvatarUrl ? (
+                        <img src={attendee.userAvatarUrl} alt={attendee.userName} className="w-full h-full object-cover" />
+                      ) : (
+                        initials(attendee.userName)
+                      )}
+                    </div>
+                    <span className="text-neutral-900 dark:text-white">{attendee.userName}</span>
+                  </div>
                   <CheckCircle className="w-4 h-4 text-neutral-800 dark:text-neutral-200" />
-                  <span className="text-neutral-900 dark:text-white">{attendee.userName}</span>
                 </div>
               ))}
             </div>
@@ -606,9 +642,19 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
               {maybeAttendees.map((attendee) => (
                 <div
                   key={attendee.id}
-                  className="flex items-center gap-2 p-2.5 rounded-2xl bg-neutral-100/60 dark:bg-neutral-900/70 border border-black/5 dark:border-white/10"
+                  className="flex items-center justify-between gap-2 p-2.5 rounded-2xl bg-neutral-100/60 dark:bg-neutral-900/70 border border-black/5 dark:border-white/10"
                 >
-                  <span className="text-neutral-900 dark:text-white">{attendee.userName}</span>
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full border border-black/5 dark:border-white/10 bg-neutral-200 dark:bg-neutral-800 overflow-hidden flex items-center justify-center text-xs font-semibold text-neutral-800 dark:text-neutral-200">
+                      {attendee.userAvatarUrl ? (
+                        <img src={attendee.userAvatarUrl} alt={attendee.userName} className="w-full h-full object-cover" />
+                      ) : (
+                        initials(attendee.userName)
+                      )}
+                    </div>
+                    <span className="text-neutral-900 dark:text-white">{attendee.userName}</span>
+                  </div>
+                  <Users className="w-4 h-4 text-neutral-800 dark:text-neutral-200" />
                 </div>
               ))}
             </div>
@@ -622,10 +668,19 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
               {noAttendees.map((attendee) => (
                 <div
                   key={attendee.id}
-                  className="flex items-center gap-2 p-2.5 rounded-2xl bg-neutral-100/60 dark:bg-neutral-900/70 border border-black/5 dark:border-white/10"
+                  className="flex items-center justify-between gap-2 p-2.5 rounded-2xl bg-neutral-100/60 dark:bg-neutral-900/70 border border-black/5 dark:border-white/10"
                 >
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full border border-black/5 dark:border-white/10 bg-neutral-200 dark:bg-neutral-800 overflow-hidden flex items-center justify-center text-xs font-semibold text-neutral-800 dark:text-neutral-200">
+                      {attendee.userAvatarUrl ? (
+                        <img src={attendee.userAvatarUrl} alt={attendee.userName} className="w-full h-full object-cover" />
+                      ) : (
+                        initials(attendee.userName)
+                      )}
+                    </div>
+                    <span className="text-neutral-900 dark:text-white">{attendee.userName}</span>
+                  </div>
                   <XCircle className="w-4 h-4 text-neutral-800 dark:text-neutral-200" />
-                  <span className="text-neutral-900 dark:text-white">{attendee.userName}</span>
                 </div>
               ))}
             </div>
@@ -645,9 +700,19 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
               {notResponded.map((attendee) => (
                 <div
                   key={attendee.id}
-                  className="flex items-center gap-2 p-2.5 rounded-2xl bg-neutral-100/60 dark:bg-neutral-900/70 border border-black/5 dark:border-white/10"
+                  className="flex items-center justify-between gap-2 p-2.5 rounded-2xl bg-neutral-100/60 dark:bg-neutral-900/70 border border-black/5 dark:border-white/10"
                 >
-                  <span className="text-neutral-900 dark:text-white">{attendee.name}</span>
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full border border-black/5 dark:border-white/10 bg-neutral-200 dark:bg-neutral-800 overflow-hidden flex items-center justify-center text-xs font-semibold text-neutral-800 dark:text-neutral-200">
+                      {attendee.avatarUrl ? (
+                        <img src={attendee.avatarUrl} alt={attendee.name} className="w-full h-full object-cover" />
+                      ) : (
+                        initials(attendee.name)
+                      )}
+                    </div>
+                    <span className="text-neutral-900 dark:text-white">{attendee.name}</span>
+                  </div>
+                  <Users className="w-4 h-4 text-neutral-800 dark:text-neutral-200" />
                 </div>
               ))}
             </div>

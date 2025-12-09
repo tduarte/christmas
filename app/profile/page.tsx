@@ -9,6 +9,7 @@ interface UserInfo {
   email: string;
   name: string;
   themePreference?: 'light' | 'dark' | 'system';
+  avatarUrl?: string | null;
 }
 
 export default function ProfilePage() {
@@ -73,6 +74,23 @@ export default function ProfilePage() {
     }
   };
 
+  const handleAvatarUpload = async (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      const res = await fetch('/api/user/avatar', {
+        method: 'POST',
+        body: formData,
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setUser(prev => prev ? { ...prev, avatarUrl: data.avatarUrl } : prev);
+      }
+    } catch (error) {
+      console.error('Failed to upload avatar', error);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-[var(--background)] dark:bg-[var(--background)] pb-20">
@@ -93,10 +111,20 @@ export default function ProfilePage() {
       </div>
 
       <div className="p-5 space-y-6">
-        <div className="bg-white/95 dark:bg-neutral-950 rounded-3xl p-6 border border-black/5 dark:border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.06)]">
-          <div className="flex items-center gap-4 mb-6">
-            <div className="w-16 h-16 rounded-2xl bg-neutral-100 dark:bg-neutral-900 flex items-center justify-center border border-black/5 dark:border-white/5">
-              <User className="w-8 h-8 text-neutral-700 dark:text-neutral-300" />
+        <div className="bg-white/95 dark:bg-neutral-950 rounded-3xl p-6 border border-black/5 dark:border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.06)] space-y-4">
+          <div className="flex items-center gap-4">
+            <div className="w-16 h-16 rounded-2xl bg-neutral-100 dark:bg-neutral-900 flex items-center justify-center border border-black/5 dark:border-white/5 overflow-hidden text-lg font-semibold text-neutral-800 dark:text-neutral-200">
+              {user?.avatarUrl ? (
+                <img src={user.avatarUrl} alt={user.name} className="w-full h-full object-cover" />
+              ) : user?.name ? (
+                user.name
+                  ?.split(' ')
+                  .map((n) => n[0])
+                  .join('')
+                  .toUpperCase()
+              ) : (
+                <User className="w-8 h-8 text-neutral-700 dark:text-neutral-300" />
+              )}
             </div>
             <div>
               <h2 className="text-xl font-semibold text-neutral-900 dark:text-white">{user?.name}</h2>
@@ -109,7 +137,25 @@ export default function ProfilePage() {
         </div>
 
         <div className="bg-white/95 dark:bg-neutral-950 rounded-3xl border border-black/5 dark:border-white/10 overflow-hidden shadow-[0_8px_25px_rgba(0,0,0,0.05)]">
-          <div className="flex flex-col gap-3 p-4 border-b border-black/5 dark:border-white/10">
+          <div className="flex items-center justify-between p-4 border-b border-black/5 dark:border-white/10">
+            <div>
+              <p className="text-sm font-semibold text-neutral-900 dark:text-white">Profile Photo</p>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400">Tap to upload a picture</p>
+            </div>
+            <label className="px-3 py-1.5 rounded-full bg-neutral-900 text-white dark:bg-white dark:text-black text-xs font-semibold cursor-pointer hover:opacity-90 transition">
+              Upload
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) handleAvatarUpload(file);
+                }}
+              />
+            </label>
+          </div>
+          <div className="flex flex-col gap-3 p-4">
             <div>
               <p className="text-sm font-semibold text-neutral-900 dark:text-white">Appearance</p>
               <p className="text-xs text-neutral-500 dark:text-neutral-400">System, Light, or Dark</p>

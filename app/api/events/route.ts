@@ -1,5 +1,5 @@
 import { db } from '@/lib/db';
-import { events, attendees } from '@/lib/schema';
+import { events, attendees, users } from '@/lib/schema';
 import { getSession } from '@/lib/auth';
 import { NextResponse } from 'next/server';
 import { eq, and, gte, lte } from 'drizzle-orm';
@@ -31,8 +31,12 @@ export async function GET(req: Request) {
         imageUrl: events.imageUrl,
         type: events.type,
         createdAt: events.createdAt,
+        hostName: users.name,
+        hostEmail: users.email,
+        hostAvatarUrl: users.avatarUrl,
       })
       .from(events)
+      .leftJoin(users, eq(events.hostId, users.id))
       .where(
         and(
           gte(events.startTime, new Date(startDate)),
@@ -209,4 +213,3 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
-

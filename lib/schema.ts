@@ -7,6 +7,7 @@ export const users = pgTable('users', {
   pin: text('pin').notNull(), // Stored as text per requirements
   name: text('name').notNull(),
   themePreference: text('theme_preference').notNull().default('system'),
+  avatarUrl: text('avatar_url'),
   createdAt: timestamp('created_at').defaultNow(),
 });
 

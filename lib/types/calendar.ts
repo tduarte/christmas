@@ -11,6 +11,9 @@ export interface CalendarEvent {
   imageUrl: string | null;
   type: 'dinner' | 'outing';
   confirmedCount: number;
+  hostName?: string;
+  hostEmail?: string;
+  hostAvatarUrl?: string | null;
 }
 
 export interface CalendarUser {

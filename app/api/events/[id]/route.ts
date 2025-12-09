@@ -2,7 +2,7 @@ import { db } from '@/lib/db';
 import { events, attendees, users } from '@/lib/schema';
 import { getSession } from '@/lib/auth';
 import { NextResponse } from 'next/server';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import OpenAI from 'openai';
 import { supabaseAdmin } from '@/lib/supabase';
 
@@ -51,6 +51,7 @@ export async function GET(
         id: users.id,
         name: users.name,
         email: users.email,
+        avatarUrl: users.avatarUrl,
       })
       .from(users)
       .where(eq(users.id, event.hostId))
@@ -64,6 +65,7 @@ export async function GET(
         status: attendees.status,
         userName: users.name,
         userEmail: users.email,
+        userAvatarUrl: users.avatarUrl,
       })
       .from(attendees)
       .innerJoin(users, eq(attendees.userId, users.id))
@@ -112,7 +114,7 @@ export async function PATCH(
     }
 
     const body = await req.json();
-    const { title, startTime, endTime, location, locationUrl, description, type, organizerId, regenerateImage } = body;
+    const { title, startTime, endTime, location, locationUrl, description, type, organizerId, regenerateImage, hostId } = body;
 
     if (!title || !startTime || !location || !type) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -125,6 +127,18 @@ export async function PATCH(
       .where(eq(events.id, eventId))
       .limit(1);
 
+    // Validate host if provided
+    let nextHostId = existingEvent.hostId;
+    if (hostId) {
+      const parsedHost = parseInt(hostId, 10);
+      if (!isNaN(parsedHost)) {
+        const [hostUser] = await db.select({ id: users.id }).from(users).where(eq(users.id, parsedHost)).limit(1);
+        if (hostUser) {
+          nextHostId = parsedHost;
+        }
+      }
+    }
+
     // Save event immediately (keep old image or set to null if regenerating)
     const updateData: any = {
       title,
@@ -135,6 +149,7 @@ export async function PATCH(
       description: description || null,
       organizerId: organizerId || session.userId,
       type: type as 'dinner' | 'outing',
+      hostId: nextHostId,
     };
 
     // If regenerating, set imageUrl to null to trigger loading state
@@ -142,11 +157,21 @@ export async function PATCH(
       updateData.imageUrl = null;
     }
 
-    const [updatedEvent] = await db
-      .update(events)
-      .set(updateData)
-      .where(eq(events.id, eventId))
-      .returning();
+    const [updatedEvent] = await db.update(events).set(updateData).where(eq(events.id, eventId)).returning();
+
+    // Ensure host is an attendee
+    const [existingHostAttendee] = await db
+      .select({ id: attendees.id })
+      .from(attendees)
+      .where(and(eq(attendees.eventId, eventId), eq(attendees.userId, nextHostId)))
+      .limit(1);
+    if (!existingHostAttendee) {
+      await db.insert(attendees).values({
+        eventId,
+        userId: nextHostId,
+        status: 'confirmed',
+      });
+    }
 
     // Return immediately so UI doesn't wait
     const response = NextResponse.json({ success: true, event: updatedEvent });
@@ -299,4 +324,3 @@ export async function DELETE(
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
-
