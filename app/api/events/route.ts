@@ -96,7 +96,7 @@ export async function POST(req: Request) {
           n: 1,
           size: "1024x1024",
         });
-        imageUrl = response.data[0].url;
+        imageUrl = response.data?.[0]?.url || null;
       } catch (aiError) {
         console.error('Error generating image:', aiError);
         // Continue without image if AI fails
