@@ -168,7 +168,7 @@ export async function PATCH(
             messages: [
               {
                 role: "system",
-                content: "You are a creative assistant helping to generate detailed prompts for DALL-E 3 image generation. The style should be 'Japanese Anime Style'. The image MUST be clearly Christmas-themed with festive elements (snow, decorations, warm lights). IMPORTANT: The image must be a SINGLE SCENE, NOT a comic strip, NO panels, NO split screens, and NO text or speech bubbles."
+                content: "You are a creative assistant helping to generate detailed prompts for image generation. The style should be 'Japanese Anime Style'. The image should be holiday themed. No text, multiple panels, or split screens."
               },
               {
                 role: "user",
