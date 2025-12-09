@@ -173,7 +173,7 @@ export default function CalendarPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-20 transition-colors duration-300">
-      <div className="sticky top-0 z-10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 py-3 flex items-center justify-between transition-colors duration-300">
+      <div className="sticky top-0 z-40 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 py-3 flex items-center justify-between transition-colors duration-300">
         <h1 className="text-xl font-bold text-slate-900 dark:text-white">Calendar</h1>
         <div className="flex items-center gap-2">
           <ThemeToggle />
@@ -350,7 +350,7 @@ export default function CalendarPage() {
             const dayEvents = groupedEvents[date] || [];
             return (
               <div key={date} className="space-y-2">
-                <h2 className="text-lg font-semibold text-slate-900 dark:text-white sticky top-16 bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur-sm py-2 z-[5]">
+                <h2 className="text-lg font-semibold text-slate-900 dark:text-white sticky top-[53px] bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur-sm py-2 z-30">
                   {formatDate(date)}
                 </h2>
                 {dayEvents.length === 0 ? (
