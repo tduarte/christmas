@@ -195,24 +195,24 @@ export default function CalendarPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-20">
-      <div className="sticky top-0 z-10 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center justify-between">
-        <h1 className="text-xl font-bold text-gray-900 dark:text-white">Calendar</h1>
-        <div className="flex items-center gap-2">
+    <div className="min-h-screen pb-20">
+      <div className="header-bg sticky top-0 z-10 border-b border-gray-700/50 px-4 py-4 flex items-center justify-between shadow-lg">
+        <h1 className="text-2xl font-bold text-white">🎄 Calendar</h1>
+        <div className="flex items-center gap-3">
           <ThemeToggle />
           <button
             onClick={() => setShowAddForm(!showAddForm)}
-            className="p-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors"
+            className="p-2.5 rounded-xl bg-red-600 text-white hover:bg-red-700 transition-all shadow-lg hover:shadow-red-600/50 hover:scale-105"
           >
-            <Plus className="w-5 h-5" />
+            <Plus className="w-6 h-6" />
           </button>
         </div>
       </div>
 
       {showAddForm && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
-            <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">Add Event</h2>
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="card-bg rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl">
+            <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">✨ Add Event</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Type Selection */}
                <div>
@@ -222,7 +222,7 @@ export default function CalendarPage() {
                 <select
                   value={formData.type}
                   onChange={(e) => setFormData({ ...formData, type: e.target.value as 'dinner' | 'outing' })}
-                  className="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white border p-2 focus:ring-2 focus:ring-red-500 outline-none"
+                  className="w-full rounded-xl border p-3 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
                 >
                   <option value="dinner">Dinner at Home</option>
                   <option value="outing">Going Out</option>
@@ -238,7 +238,7 @@ export default function CalendarPage() {
                   type="text"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white border p-2 focus:ring-2 focus:ring-red-500 outline-none"
+                  className="w-full rounded-xl border p-3 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
                   required
                 />
               </div>
@@ -257,10 +257,10 @@ export default function CalendarPage() {
                           key={date}
                           type="button"
                           onClick={() => setFormData({ ...formData, selectedDate: date })}
-                          className={`p-2 text-sm rounded-lg border ${
+                          className={`p-2.5 text-sm font-medium rounded-xl border transition-all ${
                             isSelected 
-                              ? 'bg-red-600 text-white border-red-600' 
-                              : 'bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600'
+                              ? 'bg-red-600 text-white border-red-600 shadow-lg shadow-red-600/30 scale-105' 
+                              : 'bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 hover:border-red-400'
                           }`}
                         >
                           Dec {day}
@@ -280,7 +280,7 @@ export default function CalendarPage() {
                       type="time"
                       value={formData.startTime}
                       onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
-                      className="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white border p-2 focus:ring-2 focus:ring-red-500 outline-none"
+                      className="w-full rounded-xl border p-3 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
                       required
                     />
                   </div>
@@ -292,7 +292,7 @@ export default function CalendarPage() {
                       type="time"
                       value={formData.endTime}
                       onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
-                      className="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white border p-2 focus:ring-2 focus:ring-red-500 outline-none"
+                      className="w-full rounded-xl border p-3 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
                     />
                   </div>
               </div>
@@ -306,7 +306,7 @@ export default function CalendarPage() {
                   type="text"
                   value={formData.location}
                   onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                  className="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white border p-2 focus:ring-2 focus:ring-red-500 outline-none"
+                  className="w-full rounded-xl border p-3 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
                   required
                 />
               </div>
@@ -319,7 +319,7 @@ export default function CalendarPage() {
                 <select
                   value={formData.organizerId}
                   onChange={(e) => setFormData({ ...formData, organizerId: e.target.value })}
-                  className="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white border p-2 focus:ring-2 focus:ring-red-500 outline-none"
+                  className="w-full rounded-xl border p-3 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
                 >
                   {users.length === 0 && <option value={currentUser?.id}>{currentUser?.name} (You)</option>}
                   {users.map(user => (
@@ -338,24 +338,24 @@ export default function CalendarPage() {
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white border p-2 focus:ring-2 focus:ring-red-500 outline-none"
+                  className="w-full rounded-xl border p-3 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
                   rows={3}
                 />
               </div>
 
-              <div className="flex gap-2">
+              <div className="flex gap-3 pt-2">
                 <button
                   type="button"
                   onClick={() => setShowAddForm(false)}
-                  className="flex-1 py-2 px-4 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                  className="flex-1 py-3 px-4 rounded-xl border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all font-medium"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-2 px-4 rounded-lg bg-red-600 text-white hover:bg-red-700"
+                  className="flex-1 py-3 px-4 rounded-xl bg-red-600 text-white hover:bg-red-700 transition-all font-semibold shadow-lg hover:shadow-red-600/50 hover:scale-[1.02]"
                 >
-                  Add Event
+                  ✨ Add Event
                 </button>
               </div>
             </form>
@@ -363,28 +363,31 @@ export default function CalendarPage() {
         </div>
       )}
 
-      <div className="p-4 space-y-6">
+      <div className="p-4 space-y-8 max-w-2xl mx-auto">
         {loading ? (
-          <div className="text-center py-12 text-gray-400">Loading events...</div>
+          <div className="text-center py-12">
+            <div className="inline-block w-8 h-8 border-4 border-red-600 border-t-transparent rounded-full animate-spin"></div>
+            <p className="mt-4 text-gray-600 dark:text-gray-400">Loading events...</p>
+          </div>
         ) : dates.length === 0 ? (
-          <div className="text-center py-12 text-gray-400">No events scheduled</div>
+          <div className="text-center py-12 text-gray-500 dark:text-gray-400">No events scheduled</div>
         ) : (
           dates.map((date) => {
             const dayEvents = groupedEvents[date] || [];
             return (
-              <div key={date} className="space-y-2">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white sticky top-16 bg-gray-50 dark:bg-gray-900 py-2">
+              <div key={date} className="space-y-3">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white sticky top-[72px] py-3 z-[5]" style={{ background: 'var(--background)' }}>
                   {formatDate(date)}
                 </h2>
                 {dayEvents.length === 0 ? (
-                  <div className="text-sm text-gray-400 dark:text-gray-500 py-4">No events</div>
+                  <div className="text-sm text-gray-500 dark:text-gray-400 py-4 pl-2">No events</div>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     {dayEvents.map((event) => (
                       <Link
                         key={event.id}
                         href={`/events/${event.id}`}
-                        className="group bg-white dark:bg-gray-800 rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 dark:border-gray-700 hover:scale-[1.02]"
+                        className="group card-bg rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border hover:scale-[1.02] hover:border-red-400 dark:hover:border-red-600"
                       >
                         {/* Thumbnail on top */}
                         <div className="w-full h-48 relative overflow-hidden bg-gradient-to-br from-red-50 to-green-50 dark:from-gray-900 dark:to-gray-800">
