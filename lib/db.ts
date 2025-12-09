@@ -2,10 +2,6 @@ import postgres from 'postgres';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import * as schema from './schema';
 
-import postgres from 'postgres';
-import { drizzle } from 'drizzle-orm/postgres-js';
-import * as schema from './schema';
-
 // Vercel + Supabase integration typically provides POSTGRES_URL
 // We prefer POSTGRES_URL, then DATABASE_URL, and fallback to local dev
 const connectionString = 
