@@ -161,10 +161,36 @@ export async function PATCH(
           });
 
           const eventTypeText = type === 'dinner' ? 'a cozy family dinner' : 'a festive outing';
-          const prompt = `A Christmas-themed illustration for ${eventTypeText} titled "${title}" at ${location} in the style of Rick and Morty cartoon. ${description ? `Additional context: ${description}.` : ''} `;
+          
+          // Step 1: Generate a creative prompt using GPT-4o
+          const promptGenerationResponse = await openai.chat.completions.create({
+            model: "gpt-4o",
+            messages: [
+              {
+                role: "system",
+                content: "You are a creative assistant helping to generate detailed prompts for DALL-E 3 image generation. The style should be 'Japanese Anime Style'. The image should be festive, Christmas-themed, and capture the essence of the event."
+              },
+              {
+                role: "user",
+                content: `Generate a DALL-E 3 prompt for a Christmas event image with the following details:
+                Title: ${title}
+                Type: ${eventTypeText}
+                Location: ${location}
+                ${description ? `Description: ${description}` : ''}
+                
+                The style must be Japanese Anime. Make it atmospheric and detailed.`
+              }
+            ],
+            max_tokens: 200,
+          });
+
+          const generatedPrompt = promptGenerationResponse.choices[0].message.content || `A Christmas-themed illustration for ${eventTypeText} titled "${title}" at ${location} in Japanese Anime style.`;
+          console.log('Regenerated DALL-E Prompt:', generatedPrompt);
+
+          // Step 2: Generate image using the generated prompt
           const imageResponse = await openai.images.generate({
             model: "dall-e-3",
-            prompt: prompt,
+            prompt: generatedPrompt,
             n: 1,
             size: "1024x1024",
           });
