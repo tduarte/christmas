@@ -57,6 +57,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
     description: '',
     type: 'dinner' as 'dinner' | 'outing',
     regenerateImage: false,
+    hostId: 0,
   });
 
   useEffect(() => {
@@ -150,6 +151,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
       description: event.description || '',
       type: event.type,
       regenerateImage: false,
+      hostId: event.hostId,
     });
     setShowEditForm(true);
   };
@@ -170,6 +172,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
           ...editFormData,
           startTime: startDateTime.toISOString(),
           endTime: endDateTime?.toISOString(),
+          hostId: editFormData.hostId || currentUser?.id,
         }),
       });
 
@@ -437,6 +440,23 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
                     className="w-full rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white p-3 focus:ring-2 focus:ring-neutral-900 dark:focus:ring-white/40 outline-none"
                     rows={3}
                   />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-200 mb-1">
+                    Host
+                  </label>
+                  <select
+                    value={editFormData.hostId?.toString() ?? ''}
+                    onChange={(e) => setEditFormData({ ...editFormData, hostId: parseInt(e.target.value, 10) })}
+                    className="w-full rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white p-3 focus:ring-2 focus:ring-neutral-900 dark:focus:ring-white/40 outline-none"
+                  >
+                    {allUsers.map(user => (
+                      <option key={user.id} value={user.id.toString()}>
+                        {user.name} {currentUser?.id === user.id ? '(You)' : ''}
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
                 <div className="flex items-center gap-2 p-3 bg-neutral-100/80 dark:bg-neutral-900/60 rounded-xl border border-black/5 dark:border-white/5">
