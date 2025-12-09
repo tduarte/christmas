@@ -16,6 +16,25 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Family Christmas",
   description: "Organize family dinners and White Elephant gifts",
+  openGraph: {
+    title: "Family Christmas",
+    description: "Organize family dinners and White Elephant gifts",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Family Christmas",
+      },
+    ],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Family Christmas",
+    description: "Organize family dinners and White Elephant gifts",
+    images: ["/og-image.png"],
+  },
 };
 
 export default function RootLayout({
