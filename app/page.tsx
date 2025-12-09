@@ -384,56 +384,69 @@ export default function CalendarPage() {
                       <Link
                         key={event.id}
                         href={`/events/${event.id}`}
-                        className="block bg-white dark:bg-gray-800 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 hover:border-red-300 dark:hover:border-red-700 transition-all"
+                        className="group bg-white dark:bg-gray-800 rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 dark:border-gray-700 hover:scale-[1.02]"
                       >
-                         <div className="flex">
-                            <div className="w-24 h-24 relative flex-shrink-0">
-                              {event.imageUrl ? (
-                                <img 
-                                  src={event.imageUrl} 
-                                  alt={event.title}
-                                  className="w-full h-full object-cover rounded-l-xl"
-                                />
-                              ) : (
-                                <div className="w-full h-full bg-gradient-to-br from-red-100 to-red-200 dark:from-red-900/30 dark:to-red-800/20 animate-pulse flex items-center justify-center rounded-l-xl">
-                                  <div className="text-center p-2">
-                                    <div className="w-6 h-6 border-3 border-red-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
-                                    <p className="text-[10px] text-red-600 dark:text-red-400 mt-1">AI...</p>
-                                  </div>
-                                </div>
-                              )}
+                        {/* Thumbnail on top */}
+                        <div className="w-full h-48 relative overflow-hidden bg-gradient-to-br from-red-50 to-green-50 dark:from-gray-900 dark:to-gray-800">
+                          {event.imageUrl ? (
+                            <img 
+                              src={event.imageUrl} 
+                              alt={event.title}
+                              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-gradient-to-br from-red-100 via-green-100 to-red-100 dark:from-red-900/20 dark:via-green-900/20 dark:to-red-900/20 animate-pulse flex items-center justify-center">
+                              <div className="text-center">
+                                <div className="w-12 h-12 border-4 border-red-600 dark:border-red-400 border-t-transparent rounded-full animate-spin mx-auto"></div>
+                                <p className="text-sm font-medium text-red-700 dark:text-red-300 mt-3">Generating image...</p>
+                                <p className="text-xs text-red-600/60 dark:text-red-400/60 mt-1">~10-15 seconds</p>
+                              </div>
                             </div>
-                            <div className="p-4 flex-1">
-                                <div className="flex items-start justify-between">
-                                <div className="flex-1">
-                                    <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
-                                    {event.title}
-                                    </h3>
-                                    <div className="space-y-1 text-sm text-gray-600 dark:text-gray-400">
-                                    <div className="flex items-center gap-2">
-                                        <Clock className="w-4 h-4" />
-                                        {formatTime(event.startTime)}
-                                        {event.endTime && ` - ${formatTime(event.endTime)}`}
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <MapPin className="w-4 h-4" />
-                                        {event.location}
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <Users className="w-4 h-4" />
-                                        {event.confirmedCount} confirmed
-                                    </div>
-                                    </div>
-                                </div>
-                                <div className={`px-2 py-1 rounded text-xs font-medium ${
-                                    event.type === 'dinner'
-                                    ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'
-                                    : 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400'
-                                }`}>
-                                    {event.type === 'dinner' ? 'Dinner' : 'Outing'}
-                                </div>
-                                </div>
+                          )}
+                          {/* Event type badge overlay */}
+                          <div className="absolute top-3 right-3">
+                            <span className={`px-3 py-1.5 rounded-full text-xs font-semibold shadow-lg backdrop-blur-sm ${
+                              event.type === 'dinner' 
+                                ? 'bg-red-500/90 text-white' 
+                                : 'bg-blue-500/90 text-white'
+                            }`}>
+                              {event.type === 'dinner' ? '🍽️ Dinner' : '🎉 Outing'}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Card content */}
+                        <div className="p-5">
+                          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 line-clamp-1">
+                            {event.title}
+                          </h3>
+                          
+                          <div className="space-y-2.5">
+                            <div className="flex items-center gap-2.5 text-gray-700 dark:text-gray-300">
+                              <Clock className="w-5 h-5" />
+                              <span className="text-sm font-medium">
+                                {formatTime(event.startTime)}
+                                {event.endTime && ` - ${formatTime(event.endTime)}`}
+                              </span>
                             </div>
+                            
+                            <div className="flex items-center gap-2.5 text-gray-700 dark:text-gray-300">
+                              <MapPin className="w-5 h-5" />
+                              <span className="text-sm font-medium line-clamp-1">{event.location}</span>
+                            </div>
+                            
+                            <div className="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-gray-700">
+                              <div className="flex items-center gap-2">
+                                <Users className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+                                <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                                  {event.confirmedCount} confirmed
+                                </span>
+                              </div>
+                              <div className="text-red-600 dark:text-red-400 group-hover:translate-x-1 transition-transform">
+                                <span className="text-sm font-medium">View →</span>
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       </Link>
                     ))}
