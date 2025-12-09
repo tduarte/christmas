@@ -3,6 +3,11 @@ import { events, attendees } from '@/lib/schema';
 import { getSession } from '@/lib/auth';
 import { NextResponse } from 'next/server';
 import { eq, and, gte, lte } from 'drizzle-orm';
+import OpenAI from 'openai';
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
 export async function GET(req: Request) {
   try {
@@ -13,7 +18,7 @@ export async function GET(req: Request) {
 
     const { searchParams } = new URL(req.url);
     const startDate = searchParams.get('startDate') || '2024-12-20';
-    const endDate = searchParams.get('endDate') || '2024-12-28';
+    const endDate = searchParams.get('endDate') || '2024-12-30';
 
     const eventList = await db
       .select({
@@ -25,6 +30,8 @@ export async function GET(req: Request) {
         locationUrl: events.locationUrl,
         description: events.description,
         hostId: events.hostId,
+        organizerId: events.organizerId,
+        imageUrl: events.imageUrl,
         type: events.type,
         createdAt: events.createdAt,
       })
@@ -71,10 +78,29 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const { title, startTime, endTime, location, locationUrl, description, type } = body;
+    const { title, startTime, endTime, location, locationUrl, description, type, organizerId } = body;
 
     if (!title || !startTime || !location || !type) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    }
+
+    let imageUrl = null;
+
+    // Generate image if not provided (we don't accept image upload yet, so always generate if we can)
+    if (process.env.OPENAI_API_KEY) {
+      try {
+        const prompt = `A festive and artistic illustration for a holiday event titled "${title}". ${description ? `Context: ${description}.` : ''} Style: warm, inviting, Christmas-themed.`;
+        const response = await openai.images.generate({
+          model: "dall-e-3",
+          prompt: prompt,
+          n: 1,
+          size: "1024x1024",
+        });
+        imageUrl = response.data[0].url;
+      } catch (aiError) {
+        console.error('Error generating image:', aiError);
+        // Continue without image if AI fails
+      }
     }
 
     const [newEvent] = await db.insert(events).values({
@@ -85,10 +111,13 @@ export async function POST(req: Request) {
       locationUrl: locationUrl || null,
       description: description || null,
       hostId: session.userId,
+      organizerId: organizerId || session.userId,
+      imageUrl: imageUrl || null,
       type: type as 'dinner' | 'outing',
     }).returning();
 
-    // Auto-add host as confirmed attendee
+    // Auto-add organizer as confirmed attendee if they match the host (or if we want to auto-add host)
+    // The requirement was to auto-add host. Let's keep it simple and add the creator (hostId).
     await db.insert(attendees).values({
       eventId: newEvent.id,
       userId: session.userId,

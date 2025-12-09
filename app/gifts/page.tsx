@@ -12,6 +12,7 @@ interface GiftItem {
   description: string | null;
   userName: string;
   userEmail: string;
+  turnOrder: number | null;
 }
 
 export default function GiftsPage() {
@@ -31,7 +32,7 @@ export default function GiftsPage() {
       const giftsRes = await fetch('/api/gifts');
       if (giftsRes.ok) {
         const data = await giftsRes.json();
-        setGifts(data);
+        setGifts(data.sort((a: GiftItem, b: GiftItem) => (a.turnOrder || 999) - (b.turnOrder || 999)));
         
         // Check if current user has a gift (only if user is already loaded)
         if (currentUser) {
@@ -48,6 +49,17 @@ export default function GiftsPage() {
       }
     } catch (error) {
       console.error('Failed to fetch gifts', error);
+    }
+  };
+
+  const handleShuffle = async () => {
+    try {
+      const res = await fetch('/api/gifts/shuffle', { method: 'POST' });
+      if (res.ok) {
+        fetchGifts();
+      }
+    } catch (error) {
+      console.error('Failed to shuffle gifts', error);
     }
   };
 
@@ -240,9 +252,19 @@ export default function GiftsPage() {
         )}
 
         <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-            <Gift className="w-5 h-5" />
-            All Gifts ({gifts.length})
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Gift className="w-5 h-5" />
+              All Gifts ({gifts.length})
+            </div>
+            {gifts.length > 0 && (
+              <button
+                onClick={handleShuffle}
+                className="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+              >
+                Assign Numbers
+              </button>
+            )}
           </h2>
 
           {loading ? (
@@ -258,18 +280,29 @@ export default function GiftsPage() {
                   key={gift.id}
                   className="p-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50"
                 >
-                  <div className="flex items-start gap-3">
-                    <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg">
-                      <Gift className="w-5 h-5 text-red-600 dark:text-red-400" />
-                    </div>
+                  <div className="flex items-center gap-4">
+                    {gift.turnOrder && (
+                      <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-red-600 text-white font-bold rounded-full shadow-sm text-lg">
+                        {gift.turnOrder}
+                      </div>
+                    )}
                     <div className="flex-1">
-                      <h3 className="font-semibold text-gray-900 dark:text-white">{gift.name}</h3>
-                      {gift.description && (
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{gift.description}</p>
-                      )}
-                      <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
-                        From {gift.userName}
-                      </p>
+                      <div className="flex items-start gap-3">
+                        {!gift.turnOrder && (
+                          <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg">
+                            <Gift className="w-5 h-5 text-red-600 dark:text-red-400" />
+                          </div>
+                        )}
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-gray-900 dark:text-white">{gift.name}</h3>
+                          {gift.description && (
+                            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{gift.description}</p>
+                          )}
+                          <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
+                            From {gift.userName}
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>

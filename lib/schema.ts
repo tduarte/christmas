@@ -20,6 +20,8 @@ export const events = pgTable('events', {
   locationUrl: text('location_url'),
   description: text('description'),
   hostId: integer('host_id').references(() => users.id).notNull(),
+  organizerId: integer('organizer_id').references(() => users.id),
+  imageUrl: text('image_url'),
   type: eventTypeEnum('type').notNull(),
   createdAt: timestamp('created_at').defaultNow(),
 });
@@ -39,13 +41,15 @@ export const gifts = pgTable('gifts', {
   userId: integer('user_id').references(() => users.id).notNull(),
   name: text('name').notNull(),
   description: text('description'),
+  turnOrder: integer('turn_order'),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
 });
 
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
-  hostedEvents: many(events),
+  hostedEvents: many(events, { relationName: 'host' }),
+  organizedEvents: many(events, { relationName: 'organizer' }),
   attendees: many(attendees),
   gifts: many(gifts),
 }));
@@ -54,6 +58,12 @@ export const eventsRelations = relations(events, ({ one, many }) => ({
   host: one(users, {
     fields: [events.hostId],
     references: [users.id],
+    relationName: 'host',
+  }),
+  organizer: one(users, {
+    fields: [events.organizerId],
+    references: [users.id],
+    relationName: 'organizer',
   }),
   attendees: many(attendees),
 }));
