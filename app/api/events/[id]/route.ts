@@ -161,7 +161,7 @@ export async function PATCH(
           });
 
           const eventTypeText = type === 'dinner' ? 'a cozy family dinner' : 'a festive outing';
-          const prompt = `A festive and artistic Christmas-themed illustration for ${eventTypeText} titled "${title}" at ${location}. ${description ? `Additional context: ${description}.` : ''} Style: warm, inviting, holiday atmosphere with Christmas decorations and festive colors.`;
+          const prompt = `A Christmas-themed illustration for ${eventTypeText} titled "${title}" at ${location} in the style of Rick and Morty cartoon. ${description ? `Additional context: ${description}.` : ''} Make it look like a scene from the show, with sci-fi elements or portal green colors mixed with Christmas decorations.`;
           const imageResponse = await openai.images.generate({
             model: "dall-e-3",
             prompt: prompt,
