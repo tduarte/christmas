@@ -1,12 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { format, parseISO } from 'date-fns';
-import { Plus } from 'lucide-react';
+import { format, parseISO, isSameDay } from 'date-fns';
+import { Calendar as CalendarIcon, Clock, MapPin, Users, Plus, User } from 'lucide-react';
+import Link from 'next/link';
 import BottomNav from '@/components/BottomNav';
 import ThemeToggle from '@/components/ThemeToggle';
-import CalendarView from '@/components/CalendarView';
-import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 interface Event {
   id: number;
@@ -30,7 +30,6 @@ interface User {
 }
 
 export default function CalendarPage() {
-  const router = useRouter();
   const [events, setEvents] = useState<Event[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
@@ -148,56 +147,32 @@ export default function CalendarPage() {
     }
   };
 
-  const handleEventUpdate = async (event: Event, start: Date, end: Date) => {
-    try {
-      // Optimistic update
-      setEvents(prev => prev.map(e => e.id === event.id ? { ...e, startTime: start.toISOString(), endTime: end.toISOString() } : e));
-
-      const res = await fetch(`/api/events/${event.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: event.title,
-          startTime: start.toISOString(),
-          endTime: end.toISOString(),
-          location: event.location,
-          type: event.type,
-          regenerateImage: false // Don't regenerate on simple move
-        }),
-      });
-
-      if (!res.ok) {
-        // Revert on failure
-        fetchData(); 
-        console.error('Failed to update event');
-      }
-    } catch (error) {
-      console.error('Error updating event', error);
-      fetchData();
+  // Group events by date
+  const groupedEvents = events.reduce((acc, event) => {
+    const date = format(parseISO(event.startTime), 'yyyy-MM-dd');
+    if (!acc[date]) {
+      acc[date] = [];
     }
+    acc[date].push(event);
+    return acc;
+  }, {} as Record<string, Event[]>);
+
+  // Generate dates Dec 20-27
+  const dates = [];
+  for (let i = 20; i <= 27; i++) {
+    dates.push(`2024-12-${i.toString().padStart(2, '0')}`);
+  }
+
+  const formatTime = (timeString: string) => {
+    return format(parseISO(timeString), 'h:mm a');
   };
 
-  const handleSlotSelect = (start: Date, end: Date) => {
-    setFormData({
-      ...formData,
-      selectedDate: format(start, 'yyyy-MM-dd'),
-      startTime: format(start, 'HH:mm'),
-      endTime: format(end, 'HH:mm'),
-    });
-    setShowAddForm(true);
+  const formatDate = (dateString: string) => {
+    return format(parseISO(dateString), 'EEEE, MMMM d');
   };
-
-  const handleEventClick = (event: Event) => {
-    router.push(`/events/${event.id}`);
-  };
-
-  // Generate dates Dec 20-27 for tabs? No, CalendarView handles navigation better.
-  // But user might want quick jumps.
-  // I'll keep the date tabs? The CalendarView is a full replacement.
-  // I'll remove the list view logic.
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-20 transition-colors duration-300 flex flex-col h-screen overflow-hidden">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-20 transition-colors duration-300">
       <div className="sticky top-0 z-40 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 py-3 flex items-center justify-between transition-colors duration-300">
         <h1 className="text-xl font-bold text-slate-900 dark:text-white">Calendar</h1>
         <div className="flex items-center gap-2">
@@ -212,7 +187,7 @@ export default function CalendarPage() {
       </div>
 
       {showAddForm && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-xl border border-slate-200 dark:border-slate-800">
             <h2 className="text-xl font-bold mb-4 text-slate-900 dark:text-white">Add Event</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -245,18 +220,31 @@ export default function CalendarPage() {
                 />
               </div>
 
-              {/* Date Selection - simplified for modal since we have calendar now */}
+              {/* Date Selection Buttons */}
               <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                   Date
                 </label>
-                <input
-                  type="date"
-                  value={formData.selectedDate}
-                  onChange={(e) => setFormData({ ...formData, selectedDate: e.target.value })}
-                  className="w-full rounded-lg border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white border p-2 focus:ring-2 focus:ring-red-500 outline-none transition-colors"
-                  required
-                />
+                <div className="grid grid-cols-4 gap-2">
+                  {dates.map((date) => {
+                      const day = parseInt(date.split('-')[2]);
+                      const isSelected = formData.selectedDate === date;
+                      return (
+                        <button
+                          key={date}
+                          type="button"
+                          onClick={() => setFormData({ ...formData, selectedDate: date })}
+                          className={`p-2 text-sm rounded-lg border transition-all ${
+                            isSelected 
+                              ? 'bg-red-600 text-white border-red-600 shadow-sm' 
+                              : 'bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700'
+                          }`}
+                        >
+                          Dec {day}
+                        </button>
+                      );
+                  })}
+                </div>
               </div>
 
               {/* Time Selection */}
@@ -352,16 +340,108 @@ export default function CalendarPage() {
         </div>
       )}
 
-      <div className="flex-1 p-2 overflow-hidden">
+      <div className="p-4 space-y-6">
         {loading ? (
-          <div className="text-center py-12 text-slate-400">Loading calendar...</div>
+          <div className="text-center py-12 text-slate-400">Loading events...</div>
+        ) : dates.length === 0 ? (
+          <div className="text-center py-12 text-slate-400">No events scheduled</div>
         ) : (
-          <CalendarView 
-            events={events} 
-            onEventUpdate={handleEventUpdate}
-            onEventClick={handleEventClick}
-            onSlotSelect={handleSlotSelect}
-          />
+          dates.map((date) => {
+            const dayEvents = groupedEvents[date] || [];
+            return (
+              <div key={date} className="space-y-2">
+                <h2 className="text-lg font-semibold text-slate-900 dark:text-white sticky top-[53px] bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur-sm py-2 z-30">
+                  {formatDate(date)}
+                </h2>
+                {dayEvents.length === 0 ? (
+                  <div className="text-sm text-slate-400 dark:text-slate-500 py-4">No events</div>
+                ) : (
+                  <div className="space-y-4">
+                    {dayEvents.map((event) => (
+                      <Link
+                        key={event.id}
+                        href={`/events/${event.id}`}
+                        className="group block bg-white dark:bg-slate-900 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-slate-200 dark:border-slate-800 hover:scale-[1.02] hover:border-red-200 dark:hover:border-red-900/30"
+                      >
+                        {/* Thumbnail on top */}
+                        <div className="w-full h-48 relative overflow-hidden bg-slate-100 dark:bg-slate-800">
+                          {event.imageUrl ? (
+                            <img 
+                              src={event.imageUrl} 
+                              alt={event.title}
+                              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-gradient-to-br from-red-50 via-slate-50 to-red-50 dark:from-slate-800 dark:via-slate-900 dark:to-slate-800 animate-pulse flex items-center justify-center">
+                              <div className="text-center">
+                                <div className="w-10 h-10 border-3 border-red-500 dark:border-red-400 border-t-transparent rounded-full animate-spin mx-auto"></div>
+                                <p className="text-sm font-medium text-slate-600 dark:text-slate-400 mt-3">Creating magic...</p>
+                              </div>
+                            </div>
+                          )}
+                          {/* Event type badge overlay */}
+                          <div className="absolute top-3 right-3 z-10">
+                            <span className={`px-3 py-1.5 rounded-full text-xs font-bold shadow-lg backdrop-blur-md border border-white/10 ${
+                              event.type === 'dinner' 
+                                ? 'bg-red-500/90 text-white' 
+                                : 'bg-blue-500/90 text-white'
+                            }`}>
+                              {event.type === 'dinner' ? '🍽️ Dinner' : '🎉 Outing'}
+                            </span>
+                          </div>
+                          
+                          {/* Gradient overlay for text legibility if we wanted text on image, but we don't right now */}
+                        </div>
+
+                        {/* Card content */}
+                        <div className="p-5">
+                          <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4 line-clamp-1 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
+                            {event.title}
+                          </h3>
+                          
+                          <div className="space-y-3">
+                            <div className="flex items-center gap-3 text-slate-600 dark:text-slate-400">
+                              <div className="p-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+                                <Clock className="w-4 h-4" />
+                              </div>
+                              <span className="text-sm font-medium">
+                                {formatTime(event.startTime)}
+                                {event.endTime && ` - ${formatTime(event.endTime)}`}
+                              </span>
+                            </div>
+                            
+                            <div className="flex items-center gap-3 text-slate-600 dark:text-slate-400">
+                              <div className="p-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+                                <MapPin className="w-4 h-4" />
+                              </div>
+                              <span className="text-sm font-medium line-clamp-1">{event.location}</span>
+                            </div>
+                            
+                            <div className="pt-4 mt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <div className="flex -space-x-2">
+                                  {/* Fake avatars for now since we don't have user images */}
+                                  <div className="w-6 h-6 rounded-full bg-red-100 dark:bg-red-900/50 border-2 border-white dark:border-slate-900 flex items-center justify-center text-[10px] text-red-700 dark:text-red-300 font-bold">
+                                    {event.confirmedCount}
+                                  </div>
+                                </div>
+                                <span className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                                  confirmed
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-1 text-red-600 dark:text-red-400 text-sm font-semibold group-hover:gap-2 transition-all">
+                                Details <span className="text-lg leading-none">→</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })
         )}
       </div>
 
