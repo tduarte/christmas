@@ -218,11 +218,11 @@ export default function GiftsPage() {
         </div>
 
       {showForm && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-neutral-950 rounded-3xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-black/5 dark:border-white/10">
-            <div className="flex items-center justify-between mb-4">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] flex items-end sm:items-center justify-center overflow-hidden p-0 sm:p-4">
+          <div className="bg-white dark:bg-neutral-950 w-full h-full sm:h-auto sm:max-w-md sm:rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-black/5 dark:border-white/10 flex flex-col sm:max-h-[90vh] overflow-hidden">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-black/5 dark:border-white/10">
               <h2 className="text-xl font-semibold text-neutral-900 dark:text-white">
-              {editingGiftId ? 'Edit Gift' : 'Add a Gift'}
+                {editingGiftId ? 'Edit Gift' : 'Add a Gift'}
               </h2>
               <button
                 onClick={() => {
@@ -230,54 +230,46 @@ export default function GiftsPage() {
                   setEditingGiftId(null);
                   setFormData({ name: '', description: '' });
                 }}
-                className="text-sm text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-white"
+                className="p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-900 text-neutral-600 dark:text-neutral-300"
+                aria-label="Close"
               >
-                Close
+                ✕
               </button>
             </div>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-200 mb-1">
-                  Gift Name
-                </label>
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900 dark:text-white text-neutral-900 p-3 focus:ring-2 focus:ring-neutral-900 dark:focus:ring-white/40 outline-none"
-                  placeholder="e.g., Coffee Maker"
-                  required
-                />
+            <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
+              <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4 overscroll-contain" style={{ WebkitOverflowScrolling: 'touch' }}>
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-200 mb-1">
+                    Gift Name
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className="w-full rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900 dark:text-white text-neutral-900 p-3 focus:ring-2 focus:ring-neutral-900 dark:focus:ring-white/40 outline-none"
+                    placeholder="e.g., Coffee Maker"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-200 mb-1">
+                    Description (optional)
+                  </label>
+                  <textarea
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    className="w-full rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900 dark:text-white text-neutral-900 p-3 focus:ring-2 focus:ring-neutral-900 dark:focus:ring-white/40 outline-none"
+                    rows={3}
+                    placeholder="Add any details about your gift..."
+                  />
+                </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-200 mb-1">
-                  Description (optional)
-                </label>
-                <textarea
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900 dark:text-white text-neutral-900 p-3 focus:ring-2 focus:ring-neutral-900 dark:focus:ring-white/40 outline-none"
-                  rows={3}
-                  placeholder="Add any details about your gift..."
-                />
-              </div>
-
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowForm(false);
-                    setEditingGiftId(null);
-                    setFormData({ name: '', description: '' });
-                  }}
-                  className="flex-1 py-2.5 px-4 rounded-xl border border-black/10 dark:border-white/10 text-neutral-700 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-neutral-900"
-                >
-                  Cancel
-                </button>
+              <div className="p-5 pb-7 border-t border-black/5 dark:border-white/10 bg-white/90 dark:bg-neutral-950/90 backdrop-blur-md safe-area-inset-bottom">
                 <button
                   type="submit"
-                  className="flex-1 py-2.5 px-4 rounded-xl bg-[#34C759] text-black hover:bg-[#2EC254] dark:bg-[#30D158] dark:hover:bg-[#2BC451] transition-colors"
+                  className="w-full py-3.5 px-4 rounded-2xl bg-[#34C759] text-black hover:bg-[#2EC254] dark:bg-[#30D158] dark:hover:bg-[#2BC451] transition-colors font-semibold text-base shadow-lg shadow-black/10"
                 >
                   {editingGiftId ? 'Update Gift' : 'Add Gift'}
                 </button>
