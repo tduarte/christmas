@@ -114,13 +114,13 @@ export async function POST(req: Request) {
 
           const eventTypeText = type === 'dinner' ? 'a cozy family dinner' : 'a festive outing';
           
-          // Step 1: Generate a creative prompt using GPT-4o
+          // Step 1: Generate a creative prompt using GPT-5 Nano
           const promptGenerationResponse = await openai.chat.completions.create({
-            model: "gpt-4o",
+            model: "gpt-5-nano",
             messages: [
               {
                 role: "system",
-                content: "You are a creative assistant helping to generate detailed prompts for DALL-E 3 image generation. The style should be 'Japanese Anime Style'. The image should be festive, Christmas-themed, and capture the essence of the event."
+                content: "You are a creative assistant helping to generate detailed prompts for DALL-E 3 image generation. The style should be 'Japanese Anime Style'. The image MUST be clearly Christmas-themed with festive elements (snow, decorations, warm lights) regardless of the event type."
               },
               {
                 role: "user",
@@ -130,7 +130,7 @@ export async function POST(req: Request) {
                 Location: ${location}
                 ${description ? `Description: ${description}` : ''}
                 
-                The style must be Japanese Anime. Make it atmospheric and detailed.`
+                The style must be Japanese Anime. Make it atmospheric, detailed, and strongly emphasize the Christmas vibe.`
               }
             ],
             max_tokens: 200,
