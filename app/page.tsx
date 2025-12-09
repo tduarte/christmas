@@ -53,6 +53,18 @@ export default function CalendarPage() {
     fetchData();
   }, []);
 
+  // Poll for image updates every 5 seconds if any event has null imageUrl
+  useEffect(() => {
+    const hasLoadingImages = events.some(e => e.imageUrl === null);
+    if (!hasLoadingImages) return;
+
+    const interval = setInterval(() => {
+      fetchData();
+    }, 5000); // Poll every 5 seconds
+
+    return () => clearInterval(interval);
+  }, [events]);
+
   const fetchData = async () => {
     try {
       // Fetch current user
@@ -375,15 +387,22 @@ export default function CalendarPage() {
                         className="block bg-white dark:bg-gray-800 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 hover:border-red-300 dark:hover:border-red-700 transition-all"
                       >
                          <div className="flex">
-                            {event.imageUrl && (
-                                <div className="w-24 h-full relative flex-shrink-0">
-                                     <img 
-                                        src={event.imageUrl} 
-                                        alt={event.title}
-                                        className="w-full h-full object-cover absolute inset-0"
-                                     />
+                            <div className="w-24 h-24 relative flex-shrink-0">
+                              {event.imageUrl ? (
+                                <img 
+                                  src={event.imageUrl} 
+                                  alt={event.title}
+                                  className="w-full h-full object-cover rounded-l-xl"
+                                />
+                              ) : (
+                                <div className="w-full h-full bg-gradient-to-br from-red-100 to-red-200 dark:from-red-900/30 dark:to-red-800/20 animate-pulse flex items-center justify-center rounded-l-xl">
+                                  <div className="text-center p-2">
+                                    <div className="w-6 h-6 border-3 border-red-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
+                                    <p className="text-[10px] text-red-600 dark:text-red-400 mt-1">AI...</p>
+                                  </div>
                                 </div>
-                            )}
+                              )}
+                            </div>
                             <div className="p-4 flex-1">
                                 <div className="flex items-start justify-between">
                                 <div className="flex-1">

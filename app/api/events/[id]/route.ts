@@ -111,56 +111,80 @@ export async function PATCH(
     }
 
     const body = await req.json();
-    const { title, startTime, endTime, location, locationUrl, description, type, organizerId } = body;
+    const { title, startTime, endTime, location, locationUrl, description, type, organizerId, regenerateImage } = body;
 
     if (!title || !startTime || !location || !type) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    let imageUrl = null;
+    // Get current image URL first
+    const [currentEvent] = await db
+      .select({ imageUrl: events.imageUrl })
+      .from(events)
+      .where(eq(events.id, eventId))
+      .limit(1);
 
-    // Regenerate image with new data
-    if (process.env.OPENAI_API_KEY) {
-      try {
-        const openai = new OpenAI({
-          apiKey: process.env.OPENAI_API_KEY,
-        });
+    // Save event immediately (keep old image or set to null if regenerating)
+    const updateData: any = {
+      title,
+      startTime: new Date(startTime),
+      endTime: endTime ? new Date(endTime) : null,
+      location,
+      locationUrl: locationUrl || null,
+      description: description || null,
+      organizerId: organizerId || session.userId,
+      type: type as 'dinner' | 'outing',
+    };
 
-        const eventTypeText = type === 'dinner' ? 'a cozy family dinner' : 'a festive outing';
-        const prompt = `A festive and artistic Christmas-themed illustration for ${eventTypeText} titled "${title}" at ${location}. ${description ? `Additional context: ${description}.` : ''} Style: warm, inviting, holiday atmosphere with Christmas decorations and festive colors.`;
-        const response = await openai.images.generate({
-          model: "dall-e-3",
-          prompt: prompt,
-          n: 1,
-          size: "1024x1024",
-        });
-        imageUrl = response.data?.[0]?.url || null;
-        console.log('Regenerated image URL:', imageUrl);
-      } catch (aiError) {
-        console.error('Error regenerating image:', aiError);
-        // Continue without regenerating image if AI fails
-      }
-    } else {
-      console.log('OPENAI_API_KEY not found, skipping image regeneration');
+    // If regenerating, set imageUrl to null to trigger loading state
+    if (regenerateImage) {
+      updateData.imageUrl = null;
     }
 
     const [updatedEvent] = await db
       .update(events)
-      .set({
-        title,
-        startTime: new Date(startTime),
-        endTime: endTime ? new Date(endTime) : null,
-        location,
-        locationUrl: locationUrl || null,
-        description: description || null,
-        organizerId: organizerId || session.userId,
-        imageUrl: imageUrl || null,
-        type: type as 'dinner' | 'outing',
-      })
+      .set(updateData)
       .where(eq(events.id, eventId))
       .returning();
 
-    return NextResponse.json({ success: true, event: updatedEvent });
+    // Return immediately so UI doesn't wait
+    const response = NextResponse.json({ success: true, event: updatedEvent });
+
+    // Generate image in background if requested (after response is sent)
+    if (regenerateImage && process.env.OPENAI_API_KEY) {
+      // Note: This will still block in Next.js API routes, but we return the response first
+      // For true async, you'd need a job queue. This is a compromise.
+      (async () => {
+        try {
+          const openai = new OpenAI({
+            apiKey: process.env.OPENAI_API_KEY,
+          });
+
+          const eventTypeText = type === 'dinner' ? 'a cozy family dinner' : 'a festive outing';
+          const prompt = `A festive and artistic Christmas-themed illustration for ${eventTypeText} titled "${title}" at ${location}. ${description ? `Additional context: ${description}.` : ''} Style: warm, inviting, holiday atmosphere with Christmas decorations and festive colors.`;
+          const imageResponse = await openai.images.generate({
+            model: "dall-e-3",
+            prompt: prompt,
+            n: 1,
+            size: "1024x1024",
+          });
+          const imageUrl = imageResponse.data?.[0]?.url || null;
+          console.log('Regenerated image URL:', imageUrl);
+
+          // Update with new image
+          if (imageUrl) {
+            await db
+              .update(events)
+              .set({ imageUrl })
+              .where(eq(events.id, eventId));
+          }
+        } catch (aiError) {
+          console.error('Error regenerating image:', aiError);
+        }
+      })();
+    }
+
+    return response;
   } catch (error) {
     console.error('Error updating event:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

@@ -49,6 +49,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
     locationUrl: '',
     description: '',
     type: 'dinner' as 'dinner' | 'outing',
+    regenerateImage: false,
   });
 
   useEffect(() => {
@@ -136,6 +137,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
       locationUrl: event.locationUrl || '',
       description: event.description || '',
       type: event.type,
+      regenerateImage: false,
     });
     setShowEditForm(true);
   };
@@ -344,6 +346,19 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
                   className="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white border p-2 focus:ring-2 focus:ring-red-500 outline-none"
                   rows={3}
                 />
+              </div>
+
+              <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                <input
+                  type="checkbox"
+                  id="regenerateImage"
+                  checked={editFormData.regenerateImage}
+                  onChange={(e) => setEditFormData({ ...editFormData, regenerateImage: e.target.checked })}
+                  className="w-4 h-4 text-red-600 bg-gray-100 border-gray-300 rounded focus:ring-red-500 dark:focus:ring-red-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                />
+                <label htmlFor="regenerateImage" className="text-sm text-gray-700 dark:text-gray-300">
+                  Regenerate AI image (takes ~10-15 seconds)
+                </label>
               </div>
 
               <div className="flex gap-2">

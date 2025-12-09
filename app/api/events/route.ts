@@ -80,33 +80,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    let imageUrl = null;
-
-    // Generate image if not provided (we don't accept image upload yet, so always generate if we can)
-    if (process.env.OPENAI_API_KEY) {
-      try {
-        const openai = new OpenAI({
-          apiKey: process.env.OPENAI_API_KEY,
-        });
-
-        const eventTypeText = type === 'dinner' ? 'a cozy family dinner' : 'a festive outing';
-        const prompt = `A festive and artistic Christmas-themed illustration for ${eventTypeText} titled "${title}" at ${location}. ${description ? `Additional context: ${description}.` : ''} Style: warm, inviting, holiday atmosphere with Christmas decorations and festive colors.`;
-        const response = await openai.images.generate({
-          model: "dall-e-3",
-          prompt: prompt,
-          n: 1,
-          size: "1024x1024",
-        });
-        imageUrl = response.data?.[0]?.url || null;
-        console.log('Generated image URL:', imageUrl);
-      } catch (aiError) {
-        console.error('Error generating image:', aiError);
-        // Continue without image if AI fails
-      }
-    } else {
-      console.log('OPENAI_API_KEY not found, skipping image generation');
-    }
-
+    // Create event immediately without image (imageUrl = null triggers loading state)
     const [newEvent] = await db.insert(events).values({
       title,
       startTime: new Date(startTime),
@@ -116,19 +90,55 @@ export async function POST(req: Request) {
       description: description || null,
       hostId: session.userId,
       organizerId: organizerId || session.userId,
-      imageUrl: imageUrl || null,
+      imageUrl: null, // Start with null, generate in background
       type: type as 'dinner' | 'outing',
     }).returning();
 
-    // Auto-add organizer as confirmed attendee if they match the host (or if we want to auto-add host)
-    // The requirement was to auto-add host. Let's keep it simple and add the creator (hostId).
+    // Auto-add host as confirmed attendee
     await db.insert(attendees).values({
       eventId: newEvent.id,
       userId: session.userId,
       status: 'confirmed',
     });
 
-    return NextResponse.json({ success: true, event: newEvent });
+    // Return immediately so UI doesn't wait
+    const response = NextResponse.json({ success: true, event: newEvent });
+
+    // Generate image in background
+    if (process.env.OPENAI_API_KEY) {
+      (async () => {
+        try {
+          const openai = new OpenAI({
+            apiKey: process.env.OPENAI_API_KEY,
+          });
+
+          const eventTypeText = type === 'dinner' ? 'a cozy family dinner' : 'a festive outing';
+          const prompt = `A festive and artistic Christmas-themed illustration for ${eventTypeText} titled "${title}" at ${location}. ${description ? `Additional context: ${description}.` : ''} Style: warm, inviting, holiday atmosphere with Christmas decorations and festive colors.`;
+          const imageResponse = await openai.images.generate({
+            model: "dall-e-3",
+            prompt: prompt,
+            n: 1,
+            size: "1024x1024",
+          });
+          const imageUrl = imageResponse.data?.[0]?.url || null;
+          console.log('Generated image URL:', imageUrl);
+
+          // Update event with generated image
+          if (imageUrl) {
+            await db
+              .update(events)
+              .set({ imageUrl })
+              .where(eq(events.id, newEvent.id));
+          }
+        } catch (aiError) {
+          console.error('Error generating image:', aiError);
+        }
+      })();
+    } else {
+      console.log('OPENAI_API_KEY not found, skipping image generation');
+    }
+
+    return response;
   } catch (error) {
     console.error('Error creating event:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
