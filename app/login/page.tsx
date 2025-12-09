@@ -54,32 +54,32 @@ function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <Sparkles className="w-8 h-8 text-red-600 dark:text-red-400" />
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Family Christmas</h1>
+    <div className="min-h-screen flex items-center justify-center bg-[var(--background)] dark:bg-[var(--background)] p-6">
+      <div className="w-full max-w-md space-y-6">
+        <div className="text-center space-y-2">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-neutral-900 text-white dark:bg-white dark:text-black shadow-sm text-2xl">
+            🎄
           </div>
-          <p className="text-gray-600 dark:text-gray-400">Sign in to organize events</p>
+          <h1 className="text-2xl font-semibold text-neutral-900 dark:text-white">Family Christmas</h1>
+          <p className="text-sm text-neutral-500 dark:text-neutral-400">Sign in to organize events</p>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+        <div className="space-y-4">
+          <h2 className="text-xl font-semibold text-neutral-900 dark:text-white">
             {isRegister ? 'Create Account' : 'Welcome Back'}
           </h2>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {isRegister && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-200 mb-1">
                   Name
                 </label>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white border p-3 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all"
+                  className="w-full rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900 dark:text-white text-neutral-900 p-3 focus:ring-2 focus:ring-neutral-900 dark:focus:ring-white/40 outline-none transition-all"
                   placeholder="Your name"
                   required
                 />
@@ -87,21 +87,21 @@ function LoginForm() {
             )}
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-200 mb-1">
                 Email
               </label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white border p-3 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all"
+                className="w-full rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900 dark:text-white text-neutral-900 p-3 focus:ring-2 focus:ring-neutral-900 dark:focus:ring-white/40 outline-none transition-all"
                 placeholder="your@email.com"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-200 mb-1">
                 PIN (4 digits)
               </label>
               <input
@@ -114,7 +114,7 @@ function LoginForm() {
                   const value = e.target.value.replace(/\D/g, '');
                   if (value.length <= 4) setPin(value);
                 }}
-                className="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white border p-3 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all text-center text-2xl tracking-widest"
+                className="w-full rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900 dark:text-white text-neutral-900 p-3 focus:ring-2 focus:ring-neutral-900 dark:focus:ring-white/40 outline-none transition-all text-center text-2xl tracking-widest"
                 placeholder="0000"
                 required
               />
@@ -129,30 +129,30 @@ function LoginForm() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-medium py-3 rounded-lg transition-colors shadow-sm"
+              className="w-full bg-[#34C759] hover:bg-[#2EC254] dark:bg-[#30D158] dark:hover:bg-[#2BC451] disabled:opacity-50 text-black font-semibold py-3.5 rounded-2xl transition-colors shadow-sm"
             >
               {loading ? 'Please wait...' : isRegister ? 'Create Account' : 'Sign In'}
             </button>
 
             <div className="mt-4 text-center">
               {isRegister ? (
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-neutral-600 dark:text-neutral-400">
                   Already have an account?{' '}
                   <button
                     type="button"
                     onClick={() => setIsRegister(false)}
-                    className="text-red-600 dark:text-red-400 font-medium hover:underline"
+                    className="text-neutral-900 dark:text-white font-semibold hover:underline"
                   >
                     Sign in
                   </button>
                 </p>
               ) : (
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-neutral-600 dark:text-neutral-400">
                   Don't have an account?{' '}
                   <button
                     type="button"
                     onClick={() => setIsRegister(true)}
-                    className="text-red-600 dark:text-red-400 font-medium hover:underline"
+                    className="text-neutral-900 dark:text-white font-semibold hover:underline"
                   >
                     Create one
                   </button>
@@ -173,4 +173,3 @@ export default function LoginPage() {
     </Suspense>
   );
 }
-
