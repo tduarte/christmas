@@ -32,6 +32,18 @@ export default function CalendarPage() {
     fetchData();
   }, []);
 
+  // Lock body scroll when modal is open
+  useEffect(() => {
+    if (showAddForm) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [showAddForm]);
+
   // Poll for image updates every 5 seconds if any event has null imageUrl
   useEffect(() => {
     const hasLoadingImages = events.some(e => e.imageUrl === null);

@@ -24,8 +24,14 @@ export default function AddEventForm({
   dates,
 }: AddEventFormProps) {
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] flex items-end sm:items-center justify-center">
-      <div className="bg-white dark:bg-slate-900 w-full sm:max-w-md sm:rounded-2xl rounded-t-3xl shadow-xl border-slate-200 dark:border-slate-800 sm:border border-t flex flex-col max-h-[95vh] sm:max-h-[90vh]">
+    <div 
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] flex items-end sm:items-center justify-center overflow-hidden"
+      onClick={onClose}
+    >
+      <div 
+        className="bg-white dark:bg-slate-900 w-full h-full sm:h-auto sm:max-w-md sm:rounded-2xl shadow-xl border-slate-200 dark:border-slate-800 sm:border flex flex-col sm:max-h-[90vh]"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header with close button */}
         <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-800">
           <h2 className="text-xl font-bold text-slate-900 dark:text-white">Add Event</h2>
@@ -41,7 +47,7 @@ export default function AddEventForm({
 
         {/* Scrollable form content */}
         <form onSubmit={onSubmit} className="flex flex-col flex-1 overflow-hidden">
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 overscroll-contain" style={{ WebkitOverflowScrolling: 'touch' }}>
           <div>
             <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
               Type
