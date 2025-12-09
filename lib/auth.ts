@@ -8,6 +8,7 @@ export interface SessionPayload {
   userId: number;
   email: string;
   name: string;
+  [key: string]: unknown;
 }
 
 export async function createSession(payload: SessionPayload): Promise<string> {
