@@ -89,7 +89,8 @@ export async function POST(req: Request) {
           apiKey: process.env.OPENAI_API_KEY,
         });
 
-        const prompt = `A festive and artistic illustration for a holiday event titled "${title}". ${description ? `Context: ${description}.` : ''} Style: warm, inviting, Christmas-themed.`;
+        const eventTypeText = type === 'dinner' ? 'a cozy family dinner' : 'a festive outing';
+        const prompt = `A festive and artistic Christmas-themed illustration for ${eventTypeText} titled "${title}" at ${location}. ${description ? `Additional context: ${description}.` : ''} Style: warm, inviting, holiday atmosphere with Christmas decorations and festive colors.`;
         const response = await openai.images.generate({
           model: "dall-e-3",
           prompt: prompt,
