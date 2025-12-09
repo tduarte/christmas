@@ -200,50 +200,64 @@ export default function GiftsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-20">
-        <div className="sticky top-0 z-10 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center justify-between">
-        <h1 className="text-xl font-bold text-gray-900 dark:text-white">White Elephant</h1>
-        <div className="flex items-center gap-2">
-          {isParticipating && (
-            <button
-              onClick={handleAddGift}
-              className="p-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors shadow-sm"
-            >
-              <Plus className="w-5 h-5" />
-            </button>
-          )}
+    <div className="min-h-screen bg-[var(--background)] dark:bg-[var(--background)] pb-20">
+        <div className="sticky top-0 z-10 bg-white/90 dark:bg-black/85 backdrop-blur-xl border-b border-black/5 dark:border-white/10 px-5 py-4 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold text-neutral-900 dark:text-white leading-snug">🎄 White Elephant</h1>
+          </div>
+          <div className="flex items-center gap-2">
+            {isParticipating && (
+              <button
+                onClick={handleAddGift}
+                className="p-2.5 rounded-full bg-neutral-900 text-white hover:bg-neutral-800 active:scale-95 transition-all shadow-sm"
+              >
+                <Plus className="w-5 h-5" />
+              </button>
+            )}
+          </div>
         </div>
-      </div>
 
       {showForm && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-xl border border-gray-200 dark:border-gray-700">
-            <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
+          <div className="bg-white dark:bg-neutral-950 rounded-3xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-black/5 dark:border-white/10">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold text-neutral-900 dark:text-white">
               {editingGiftId ? 'Edit Gift' : 'Add a Gift'}
-            </h2>
+              </h2>
+              <button
+                onClick={() => {
+                  setShowForm(false);
+                  setEditingGiftId(null);
+                  setFormData({ name: '', description: '' });
+                }}
+                className="text-sm text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-white"
+              >
+                Close
+              </button>
+            </div>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-200 mb-1">
                   Gift Name
                 </label>
                 <input
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white border p-2 focus:ring-2 focus:ring-red-500 outline-none"
+                  className="w-full rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900 dark:text-white text-neutral-900 p-3 focus:ring-2 focus:ring-neutral-900 dark:focus:ring-white/40 outline-none"
                   placeholder="e.g., Coffee Maker"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-200 mb-1">
                   Description (optional)
                 </label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white border p-2 focus:ring-2 focus:ring-red-500 outline-none"
+                  className="w-full rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900 dark:text-white text-neutral-900 p-3 focus:ring-2 focus:ring-neutral-900 dark:focus:ring-white/40 outline-none"
                   rows={3}
                   placeholder="Add any details about your gift..."
                 />
@@ -257,13 +271,13 @@ export default function GiftsPage() {
                     setEditingGiftId(null);
                     setFormData({ name: '', description: '' });
                   }}
-                  className="flex-1 py-2 px-4 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                  className="flex-1 py-2.5 px-4 rounded-xl border border-black/10 dark:border-white/10 text-neutral-700 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-neutral-900"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-2 px-4 rounded-lg bg-red-600 text-white hover:bg-red-700"
+                  className="flex-1 py-2.5 px-4 rounded-xl bg-neutral-900 text-white hover:bg-neutral-800 transition-colors"
                 >
                   {editingGiftId ? 'Update Gift' : 'Add Gift'}
                 </button>
@@ -273,12 +287,12 @@ export default function GiftsPage() {
         </div>
       )}
 
-      <div className="p-4 space-y-6">
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+      <div className="p-5 space-y-6">
+        <div className="bg-white/95 dark:bg-neutral-950 rounded-3xl p-6 border border-black/5 dark:border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.06)]">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Your Participation</h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              <h2 className="text-lg font-semibold text-neutral-900 dark:text-white">Your Participation</h2>
+              <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
                 {isParticipating 
                   ? myGifts.length > 0 
                     ? `You're participating with ${myGifts.length} gift${myGifts.length !== 1 ? 's' : ''}`
@@ -291,7 +305,7 @@ export default function GiftsPage() {
           {!isParticipating ? (
             <button
               onClick={handleJoin}
-              className="w-full py-3 px-4 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors font-medium flex items-center justify-center gap-2"
+              className="w-full py-3 px-4 rounded-2xl bg-neutral-900 text-white hover:bg-neutral-800 transition-colors font-semibold flex items-center justify-center gap-2 shadow-sm"
             >
               <Plus className="w-5 h-5" />
               Join White Elephant
@@ -299,13 +313,13 @@ export default function GiftsPage() {
           ) : (
             <div className="space-y-3">
               {myGifts.length === 0 ? (
-                <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg text-center">
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                <div className="p-4 bg-neutral-100/80 dark:bg-neutral-900/60 rounded-2xl text-center border border-black/5 dark:border-white/5">
+                  <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-3">
                     You haven't added any gifts yet
                   </p>
                   <button
                     onClick={handleAddGift}
-                    className="py-2 px-4 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors font-medium inline-flex items-center gap-2"
+                    className="py-2.5 px-4 rounded-xl bg-neutral-900 text-white hover:bg-neutral-800 transition-colors font-semibold inline-flex items-center gap-2"
                   >
                     <Plus className="w-4 h-4" />
                     Add a Gift
@@ -314,38 +328,38 @@ export default function GiftsPage() {
               ) : (
                 <>
                   <div className="space-y-2">
-                    <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <h3 className="text-sm font-medium text-neutral-700 dark:text-neutral-200">
                       Your Gifts ({myGifts.length})
                     </h3>
                     {myGifts.map((gift) => (
                       <div
                         key={gift.id}
-                        className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg"
+                        className="p-3 bg-neutral-100/60 dark:bg-neutral-900/70 rounded-xl border border-black/5 dark:border-white/5"
                       >
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
                             <div className="flex items-center gap-2">
-                              <h4 className="font-semibold text-gray-900 dark:text-white">{gift.name}</h4>
+                              <h4 className="font-semibold text-neutral-900 dark:text-white">{gift.name}</h4>
                               {gift.turnOrder && (
-                                <span className="px-2 py-0.5 text-xs font-bold bg-red-600 text-white rounded-full">
+                                <span className="px-2 py-0.5 text-xs font-bold bg-neutral-900 text-white rounded-full">
                                   #{gift.turnOrder}
                                 </span>
                               )}
                             </div>
                             {gift.description && (
-                              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{gift.description}</p>
+                              <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">{gift.description}</p>
                             )}
                           </div>
                           <div className="flex gap-1 ml-2">
                             <button
                               onClick={() => handleEditGift(gift)}
-                              className="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-400"
+                              className="p-2 rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-800 text-neutral-600 dark:text-neutral-400"
                             >
                               <Edit2 className="w-4 h-4" />
                             </button>
                             <button
                               onClick={() => handleDeleteGift(gift.id)}
-                              className="p-2 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-red-600 dark:text-red-400"
+                              className="p-2 rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300"
                             >
                               <Trash2 className="w-4 h-4" />
                             </button>
@@ -358,7 +372,7 @@ export default function GiftsPage() {
               )}
               <button
                 onClick={handleLeave}
-                className="w-full py-2 px-4 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-medium"
+                className="w-full py-2.5 px-4 rounded-xl border border-black/10 dark:border-white/10 text-neutral-700 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors font-semibold"
               >
                 Leave White Elephant
               </button>
@@ -366,8 +380,8 @@ export default function GiftsPage() {
           )}
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center justify-between">
+        <div className="bg-white/95 dark:bg-neutral-950 rounded-3xl p-6 border border-black/5 dark:border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.06)]">
+          <h2 className="text-lg font-semibold text-neutral-900 dark:text-white mb-4 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Gift className="w-5 h-5" />
               All Gifts ({gifts.length})
@@ -375,7 +389,7 @@ export default function GiftsPage() {
             {gifts.length > 0 && (
               <button
                 onClick={handleShuffle}
-                className="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                className="text-xs px-3 py-1.5 bg-neutral-100 dark:bg-neutral-900 text-neutral-700 dark:text-neutral-200 rounded-full hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-colors border border-black/5 dark:border-white/5"
               >
                 Assign Numbers
               </button>
@@ -383,9 +397,9 @@ export default function GiftsPage() {
           </h2>
 
           {loading ? (
-            <div className="text-center py-8 text-gray-400">Loading gifts...</div>
+            <div className="text-center py-8 text-neutral-400">Loading gifts...</div>
           ) : gifts.length === 0 ? (
-            <div className="text-center py-8 text-gray-400">
+            <div className="text-center py-8 text-neutral-400">
               No one has added gifts yet. Be the first!
             </div>
           ) : (
@@ -393,27 +407,27 @@ export default function GiftsPage() {
               {gifts.map((gift) => (
                 <div
                   key={gift.id}
-                  className="p-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50"
+                  className="p-4 rounded-2xl border border-black/5 dark:border-white/10 bg-white dark:bg-neutral-950 shadow-sm"
                 >
                   <div className="flex items-center gap-4">
                     {gift.turnOrder && (
-                      <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-red-600 text-white font-bold rounded-full shadow-sm text-lg">
+                      <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-neutral-900 text-white font-semibold rounded-full shadow-sm text-lg">
                         {gift.turnOrder}
                       </div>
                     )}
                     <div className="flex-1">
                       <div className="flex items-start gap-3">
                         {!gift.turnOrder && (
-                          <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg">
-                            <Gift className="w-5 h-5 text-red-600 dark:text-red-400" />
+                          <div className="p-2 bg-neutral-100 dark:bg-neutral-900 rounded-xl border border-black/5 dark:border-white/5">
+                            <Gift className="w-5 h-5 text-neutral-600 dark:text-neutral-300" />
                           </div>
                         )}
                         <div className="flex-1">
-                          <h3 className="font-semibold text-gray-900 dark:text-white">{gift.name}</h3>
+                          <h3 className="font-semibold text-neutral-900 dark:text-white">{gift.name}</h3>
                           {gift.description && (
-                            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{gift.description}</p>
+                            <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">{gift.description}</p>
                           )}
-                          <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
+                          <p className="text-xs text-neutral-500 dark:text-neutral-500 mt-2">
                             From {gift.userName}
                           </p>
                         </div>

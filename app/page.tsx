@@ -163,13 +163,16 @@ export default function CalendarPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-gray-900 pb-20 transition-colors duration-300">
-      <div className="sticky top-0 z-40 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 py-3 flex items-center justify-between transition-colors duration-300">
-        <h1 className="text-xl font-bold text-slate-900 dark:text-white">Calendar</h1>
+    <div className="min-h-screen bg-[var(--background)] dark:bg-[var(--background)] pb-20 transition-colors duration-300">
+      <div className="sticky top-0 z-40 bg-white/90 dark:bg-black/80 backdrop-blur-xl border-b border-black/5 dark:border-white/10 px-5 py-3.5 flex items-center justify-between transition-colors duration-300">
+        <div>
+          <h1 className="text-2xl font-semibold text-neutral-900 dark:text-white leading-snug">🎄 Calendar</h1>
+        </div>
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowAddForm(!showAddForm)}
-            className="p-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors shadow-sm"
+            className="p-2.5 rounded-full bg-neutral-900 text-white hover:bg-neutral-800 active:scale-95 transition-all shadow-sm"
+            aria-label="Add event"
           >
             <Plus className="w-5 h-5" />
           </button>
@@ -188,21 +191,21 @@ export default function CalendarPage() {
         />
       )}
 
-      <div className="p-4 space-y-6">
+      <div className="p-5 space-y-8">
         {loading ? (
-          <div className="text-center py-12 text-slate-400">Loading events...</div>
+          <div className="text-center py-12 text-neutral-400">Loading events...</div>
         ) : dates.length === 0 ? (
-          <div className="text-center py-12 text-slate-400">No events scheduled</div>
+          <div className="text-center py-12 text-neutral-400">No events scheduled</div>
         ) : (
           dates.map((date) => {
             const dayEvents = groupedEvents[date] || [];
             return (
               <div key={date} className="space-y-2">
-                <h2 className="text-lg font-semibold text-slate-900 dark:text-white sticky top-[53px] bg-slate-50/95 dark:bg-gray-900/95 backdrop-blur-sm py-2 z-30">
+                <h2 className="text-base font-semibold text-neutral-900 dark:text-white sticky top-[64px] bg-[var(--background)]/95 dark:bg-[var(--background)]/95 backdrop-blur-sm py-2 -mx-5 px-5 z-30">
                   {formatDate(date)}
                 </h2>
                 {dayEvents.length === 0 ? (
-                  <div className="text-sm text-slate-400 dark:text-slate-500 py-4">No events</div>
+                  <div className="text-sm text-neutral-400 dark:text-neutral-500 py-4">No events</div>
                 ) : (
                   <div className="space-y-4">
                     {dayEvents.map((event) => (
