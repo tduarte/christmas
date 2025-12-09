@@ -179,7 +179,7 @@ export default function CalendarPage() {
         <div className="flex items-center gap-2">
           <button
             onClick={() => openAddForm()}
-            className="p-2.5 rounded-full bg-neutral-900 text-white hover:bg-neutral-800 active:scale-95 transition-all shadow-sm"
+            className="p-2.5 rounded-full bg-[#34C759] text-black hover:bg-[#2EC254] active:scale-95 transition-all shadow-sm dark:bg-[#30D158] dark:hover:bg-[#2BC451]"
             aria-label="Add event"
           >
             <Plus className="w-5 h-5" />

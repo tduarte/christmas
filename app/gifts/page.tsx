@@ -209,7 +209,7 @@ export default function GiftsPage() {
             {isParticipating && (
               <button
                 onClick={handleAddGift}
-                className="p-2.5 rounded-full bg-neutral-900 text-white hover:bg-neutral-800 active:scale-95 transition-all shadow-sm"
+                className="p-2.5 rounded-full bg-[#34C759] text-black hover:bg-[#2EC254] active:scale-95 transition-all shadow-sm dark:bg-[#30D158] dark:hover:bg-[#2BC451]"
               >
                 <Plus className="w-5 h-5" />
               </button>
@@ -277,7 +277,7 @@ export default function GiftsPage() {
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-2.5 px-4 rounded-xl bg-neutral-900 text-white hover:bg-neutral-800 transition-colors"
+                  className="flex-1 py-2.5 px-4 rounded-xl bg-[#34C759] text-black hover:bg-[#2EC254] dark:bg-[#30D158] dark:hover:bg-[#2BC451] transition-colors"
                 >
                   {editingGiftId ? 'Update Gift' : 'Add Gift'}
                 </button>

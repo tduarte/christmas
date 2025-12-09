@@ -201,7 +201,7 @@ export default function AddEventForm({
         <div className="p-5 border-t border-black/5 dark:border-white/10 bg-white/90 dark:bg-neutral-950/90 backdrop-blur-md">
           <button
             type="submit"
-            className="w-full py-3.5 px-4 rounded-2xl bg-neutral-900 text-white hover:bg-neutral-800 transition-all font-semibold text-base shadow-lg shadow-black/10"
+            className="w-full py-3.5 px-4 rounded-2xl bg-[#34C759] text-black hover:bg-[#2EC254] dark:bg-[#30D158] dark:hover:bg-[#2BC451] transition-all font-semibold text-base shadow-lg shadow-black/10"
           >
             Save Event
           </button>

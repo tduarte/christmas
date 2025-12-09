@@ -6,6 +6,7 @@ export const users = pgTable('users', {
   email: text('email').notNull().unique(),
   pin: text('pin').notNull(), // Stored as text per requirements
   name: text('name').notNull(),
+  themePreference: text('theme_preference').notNull().default('system'),
   createdAt: timestamp('created_at').defaultNow(),
 });
 
@@ -99,4 +100,3 @@ export const participantsRelations = relations(participants, ({ one }) => ({
     references: [users.id],
   }),
 }));
-

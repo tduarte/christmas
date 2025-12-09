@@ -28,14 +28,28 @@ export default function BottomNav() {
                 isActive ? 'text-neutral-900 dark:text-white' : 'text-neutral-500 dark:text-neutral-400'
               }`}
             >
-              {isActive ? (
-                <span className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-neutral-900 text-white dark:bg-[#1C1C1E] dark:text-white shadow-sm">
-                  <Icon className="w-5 h-5" />
-                  <span className="text-xs font-medium">{tab.label}</span>
+              <span
+                className={`flex items-center px-3 py-1.5 rounded-full transition-all duration-300 ${
+                  isActive
+                    ? 'bg-neutral-900 text-white dark:bg-[#1C1C1E] dark:text-white shadow-sm gap-2'
+                    : 'bg-transparent gap-0'
+                }`}
+              >
+                <Icon
+                  className={`w-5 h-5 transition-transform transition-opacity duration-300 ${
+                    isActive ? 'scale-110 opacity-100' : 'scale-100 opacity-80'
+                  }`}
+                />
+                <span
+                  className={`text-xs font-medium overflow-hidden min-w-0 transition-[max-width,opacity,transform] duration-300 ease-out ${
+                    isActive
+                      ? 'max-w-[96px] opacity-100 translate-y-0'
+                      : 'max-w-0 opacity-0 -translate-y-1'
+                  }`}
+                >
+                  {tab.label}
                 </span>
-              ) : (
-                <Icon className="w-5 h-5" />
-              )}
+              </span>
             </Link>
           );
         })}

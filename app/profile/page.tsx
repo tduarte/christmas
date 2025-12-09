@@ -4,18 +4,18 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { User, LogOut, Mail } from 'lucide-react';
 import BottomNav from '@/components/BottomNav';
-import ThemeToggle from '@/components/ThemeToggle';
-
 interface UserInfo {
   id: number;
   email: string;
   name: string;
+  themePreference?: 'light' | 'dark' | 'system';
 }
 
 export default function ProfilePage() {
   const router = useRouter();
   const [user, setUser] = useState<UserInfo | null>(null);
   const [loading, setLoading] = useState(true);
+  const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('system');
 
   useEffect(() => {
     fetchUser();
@@ -27,11 +27,39 @@ export default function ProfilePage() {
       if (res.ok) {
         const data = await res.json();
         setUser(data);
+        if (data.themePreference) {
+          setTheme(data.themePreference);
+        }
       }
     } catch (error) {
       console.error('Failed to fetch user', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const applyTheme = (mode: 'light' | 'dark' | 'system') => {
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const resolved = mode === 'system' ? (prefersDark ? 'dark' : 'light') : mode;
+    if (resolved === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    localStorage.setItem('theme', mode);
+  };
+
+  const handleThemeChange = async (mode: 'light' | 'dark' | 'system') => {
+    setTheme(mode);
+    applyTheme(mode);
+    try {
+      await fetch('/api/user', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ themePreference: mode }),
+      });
+    } catch (error) {
+      console.error('Failed to save theme preference', error);
     }
   };
 
@@ -62,7 +90,6 @@ export default function ProfilePage() {
         <div>
           <h1 className="text-2xl font-semibold text-neutral-900 dark:text-white leading-snug">🎄 Profile</h1>
         </div>
-        <ThemeToggle />
       </div>
 
       <div className="p-5 space-y-6">
@@ -77,6 +104,30 @@ export default function ProfilePage() {
                 <Mail className="w-4 h-4" />
                 {user?.email}
               </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white/95 dark:bg-neutral-950 rounded-3xl border border-black/5 dark:border-white/10 overflow-hidden shadow-[0_8px_25px_rgba(0,0,0,0.05)]">
+          <div className="flex flex-col gap-3 p-4 border-b border-black/5 dark:border-white/10">
+            <div>
+              <p className="text-sm font-semibold text-neutral-900 dark:text-white">Appearance</p>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400">System, Light, or Dark</p>
+            </div>
+            <div className="flex w-full rounded-full border border-black/10 dark:border-white/10 bg-neutral-100 dark:bg-neutral-900 overflow-hidden h-12">
+              {(['system', 'light', 'dark'] as const).map(option => (
+                <button
+                  key={option}
+                  onClick={() => handleThemeChange(option)}
+                  className={`flex-1 px-4 text-sm font-semibold transition-colors ${
+                    theme === option
+                      ? 'bg-neutral-900 text-white dark:bg-white dark:text-black'
+                      : 'text-neutral-600 dark:text-neutral-400'
+                  }`}
+                >
+                  {option === 'system' ? 'System' : option === 'light' ? 'Light' : 'Dark'}
+                </button>
+              ))}
             </div>
           </div>
         </div>
