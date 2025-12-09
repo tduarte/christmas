@@ -4,6 +4,7 @@ import { getSession } from '@/lib/auth';
 import { NextResponse } from 'next/server';
 import { eq, and, gte, lte } from 'drizzle-orm';
 import OpenAI from 'openai';
+import { supabaseAdmin } from '@/lib/supabase';
 
 export async function GET(req: Request) {
   try {
@@ -146,15 +147,53 @@ export async function POST(req: Request) {
             n: 1,
             size: "1024x1024",
           });
-          const imageUrl = imageResponse.data?.[0]?.url || null;
-          console.log('Generated image URL:', imageUrl);
+          const temporaryImageUrl = imageResponse.data?.[0]?.url || null;
+          console.log('Generated temporary image URL:', temporaryImageUrl);
 
-          // Update event with generated image
-          if (imageUrl) {
-            await db
-              .update(events)
-              .set({ imageUrl })
-              .where(eq(events.id, newEvent.id));
+          // Download and upload to Supabase Storage
+          if (temporaryImageUrl) {
+            try {
+              // Download the image from OpenAI
+              const imageDownloadResponse = await fetch(temporaryImageUrl);
+              const imageBuffer = await imageDownloadResponse.arrayBuffer();
+              
+              // Generate a unique filename
+              const fileName = `event-${newEvent.id}-${Date.now()}.png`;
+              
+              // Upload to Supabase Storage
+              const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
+                .from('event-images')
+                .upload(fileName, imageBuffer, {
+                  contentType: 'image/png',
+                  upsert: false,
+                });
+
+              if (uploadError) {
+                console.error('Error uploading to Supabase:', uploadError);
+                throw uploadError;
+              }
+
+              // Get the public URL
+              const { data: publicUrlData } = supabaseAdmin.storage
+                .from('event-images')
+                .getPublicUrl(fileName);
+
+              const permanentImageUrl = publicUrlData.publicUrl;
+              console.log('Uploaded to Supabase:', permanentImageUrl);
+
+              // Update event with permanent Supabase URL
+              await db
+                .update(events)
+                .set({ imageUrl: permanentImageUrl })
+                .where(eq(events.id, newEvent.id));
+            } catch (uploadError) {
+              console.error('Error uploading image to Supabase:', uploadError);
+              // Fallback to temporary URL if upload fails
+              await db
+                .update(events)
+                .set({ imageUrl: temporaryImageUrl })
+                .where(eq(events.id, newEvent.id));
+            }
           }
         } catch (aiError) {
           console.error('Error generating image:', aiError);

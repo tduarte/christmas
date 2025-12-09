@@ -46,12 +46,19 @@ export const gifts = pgTable('gifts', {
   updatedAt: timestamp('updated_at').defaultNow(),
 });
 
+export const participants = pgTable('participants', {
+  id: serial('id').primaryKey(),
+  userId: integer('user_id').references(() => users.id).notNull().unique(),
+  createdAt: timestamp('created_at').defaultNow(),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   hostedEvents: many(events, { relationName: 'host' }),
   organizedEvents: many(events, { relationName: 'organizer' }),
   attendees: many(attendees),
   gifts: many(gifts),
+  participants: many(participants),
 }));
 
 export const eventsRelations = relations(events, ({ one, many }) => ({
@@ -82,6 +89,13 @@ export const attendeesRelations = relations(attendees, ({ one }) => ({
 export const giftsRelations = relations(gifts, ({ one }) => ({
   user: one(users, {
     fields: [gifts.userId],
+    references: [users.id],
+  }),
+}));
+
+export const participantsRelations = relations(participants, ({ one }) => ({
+  user: one(users, {
+    fields: [participants.userId],
     references: [users.id],
   }),
 }));

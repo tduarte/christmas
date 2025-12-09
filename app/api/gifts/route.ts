@@ -2,7 +2,7 @@ import { db } from '@/lib/db';
 import { gifts, users } from '@/lib/schema';
 import { getSession } from '@/lib/auth';
 import { NextResponse } from 'next/server';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 
 export async function GET() {
   try {
@@ -47,41 +47,19 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Gift name is required' }, { status: 400 });
     }
 
-    // Check if user already has a gift
-    const existing = await db
-      .select()
-      .from(gifts)
-      .where(eq(gifts.userId, session.userId))
-      .limit(1);
+    // Always create a new gift (allow multiple gifts per user)
+    const [newGift] = await db
+      .insert(gifts)
+      .values({
+        userId: session.userId,
+        name,
+        description: description || null,
+      })
+      .returning();
 
-    if (existing.length > 0) {
-      // Update existing
-      const [updated] = await db
-        .update(gifts)
-        .set({
-          name,
-          description: description || null,
-          updatedAt: new Date(),
-        })
-        .where(eq(gifts.id, existing[0].id))
-        .returning();
-
-      return NextResponse.json({ success: true, gift: updated });
-    } else {
-      // Create new
-      const [newGift] = await db
-        .insert(gifts)
-        .values({
-          userId: session.userId,
-          name,
-          description: description || null,
-        })
-        .returning();
-
-      return NextResponse.json({ success: true, gift: newGift });
-    }
+    return NextResponse.json({ success: true, gift: newGift });
   } catch (error) {
-    console.error('Error creating/updating gift:', error);
+    console.error('Error creating gift:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
@@ -93,10 +71,17 @@ export async function DELETE(req: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Delete user's gift (opting out)
+    const body = await req.json();
+    const { giftId } = body;
+
+    if (!giftId) {
+      return NextResponse.json({ error: 'Gift ID is required' }, { status: 400 });
+    }
+
+    // Delete specific gift (verify ownership)
     await db
       .delete(gifts)
-      .where(eq(gifts.userId, session.userId));
+      .where(and(eq(gifts.id, giftId), eq(gifts.userId, session.userId)));
 
     return NextResponse.json({ success: true });
   } catch (error) {

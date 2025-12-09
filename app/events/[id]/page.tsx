@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { format, parseISO } from 'date-fns';
 import { Clock, MapPin, Users, ArrowLeft, ExternalLink, CheckCircle, XCircle, Edit2, Trash2 } from 'lucide-react';
 import BottomNav from '@/components/BottomNav';
-import ThemeToggle from '@/components/ThemeToggle';
 
 interface EventDetail {
   id: number;
@@ -226,7 +225,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-20">
-      <div className="sticky top-0 z-10 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center gap-3">
+        <div className="sticky top-0 z-10 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center gap-3">
         <button
           onClick={() => router.back()}
           className="p-2 -ml-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -250,7 +249,6 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
             </button>
           </div>
         )}
-        <ThemeToggle />
       </div>
 
       {showEditForm && (
@@ -293,6 +291,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
                   type="datetime-local"
                   value={editFormData.startTime}
                   onChange={(e) => setEditFormData({ ...editFormData, startTime: e.target.value })}
+                  step="1800"
                   className="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white border p-2 focus:ring-2 focus:ring-red-500 outline-none"
                   required
                 />
@@ -306,6 +305,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
                   type="datetime-local"
                   value={editFormData.endTime}
                   onChange={(e) => setEditFormData({ ...editFormData, endTime: e.target.value })}
+                  step="1800"
                   className="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white border p-2 focus:ring-2 focus:ring-red-500 outline-none"
                 />
               </div>
@@ -442,38 +442,45 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
             <Users className="w-5 h-5" />
             Your Attendance
           </h3>
-          <div className="flex gap-2">
+          <div className="flex flex-row flex-wrap gap-2">
             <button
               onClick={() => updateAttendance('confirmed')}
-              className={`flex-1 py-2 px-4 rounded-lg font-medium transition-colors ${
+              className={`flex-1 py-3 px-4 rounded-lg font-medium transition-colors ${
                 myStatus === 'confirmed'
                   ? 'bg-green-600 text-white'
                   : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
               }`}
             >
-              <CheckCircle className="w-4 h-4 inline mr-1" />
-              Going
+              <div className="flex flex-col items-center gap-1">
+                <CheckCircle className="w-6 h-6" />
+                <span>Going</span>
+              </div>
             </button>
             <button
               onClick={() => updateAttendance('maybe')}
-              className={`flex-1 py-2 px-4 rounded-lg font-medium transition-colors ${
+              className={`flex-1 py-3 px-4 rounded-lg font-medium transition-colors ${
                 myStatus === 'maybe'
                   ? 'bg-yellow-600 text-white'
                   : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
               }`}
             >
-              Maybe
+              <div className="flex flex-col items-center gap-1">
+                <Users className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
+                <span>Maybe</span>
+              </div>
             </button>
             <button
               onClick={() => updateAttendance('no')}
-              className={`flex-1 py-2 px-4 rounded-lg font-medium transition-colors ${
+              className={`flex-1 py-3 px-4 rounded-lg font-medium transition-colors ${
                 myStatus === 'no'
                   ? 'bg-red-600 text-white'
                   : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
               }`}
             >
-              <XCircle className="w-4 h-4 inline mr-1" />
-              Can't Go
+              <div className="flex flex-col items-center gap-1">
+                <XCircle className="w-6 h-6" />
+                <span>Nop</span>
+              </div>
             </button>
           </div>
         </div>

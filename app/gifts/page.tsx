@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { Gift, Plus, Edit2, Trash2 } from 'lucide-react';
 import BottomNav from '@/components/BottomNav';
-import ThemeToggle from '@/components/ThemeToggle';
 
 interface GiftItem {
   id: number;
@@ -20,13 +19,25 @@ export default function GiftsPage() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [isParticipating, setIsParticipating] = useState(false);
-  const [myGift, setMyGift] = useState<GiftItem | null>(null);
+  const [myGifts, setMyGifts] = useState<GiftItem[]>([]);
   const [currentUser, setCurrentUser] = useState<{ id: number; email: string } | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
+  const [editingGiftId, setEditingGiftId] = useState<number | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
   });
+
+  const fetchParticipation = async () => {
+    try {
+      const res = await fetch('/api/participants');
+      if (res.ok) {
+        const data = await res.json();
+        setIsParticipating(data.isParticipating);
+      }
+    } catch (error) {
+      console.error('Failed to fetch participation', error);
+    }
+  };
 
   const fetchGifts = async () => {
     try {
@@ -35,17 +46,10 @@ export default function GiftsPage() {
         const data = await giftsRes.json();
         setGifts(data.sort((a: GiftItem, b: GiftItem) => (a.turnOrder || 999) - (b.turnOrder || 999)));
         
-        // Check if current user has a gift (only if user is already loaded)
+        // Filter current user's gifts
         if (currentUser) {
-          const myGiftData = data.find((g: GiftItem) => g.userId === currentUser.id);
-          setIsParticipating(!!myGiftData);
-          setMyGift(myGiftData || null);
-          if (myGiftData) {
-            setFormData({
-              name: myGiftData.name,
-              description: myGiftData.description || '',
-            });
-          }
+          const userGifts = data.filter((g: GiftItem) => g.userId === currentUser.id);
+          setMyGifts(userGifts);
         }
       }
     } catch (error) {
@@ -66,30 +70,15 @@ export default function GiftsPage() {
 
   useEffect(() => {
     const loadData = async () => {
-      // Fetch current user first
       try {
+        // Fetch current user first
         const userRes = await fetch('/api/user');
         if (userRes.ok) {
           const user = await userRes.json();
           setCurrentUser(user);
           
-          // Then fetch gifts
-          const giftsRes = await fetch('/api/gifts');
-          if (giftsRes.ok) {
-            const data = await giftsRes.json();
-            setGifts(data);
-            
-            // Check if current user has a gift
-            const myGiftData = data.find((g: GiftItem) => g.userId === user.id);
-            setIsParticipating(!!myGiftData);
-            setMyGift(myGiftData || null);
-            if (myGiftData) {
-              setFormData({
-                name: myGiftData.name,
-                description: myGiftData.description || '',
-              });
-            }
-          }
+          // Then fetch participation and gifts in parallel
+          await Promise.all([fetchParticipation(), fetchGifts()]);
         }
       } catch (error) {
         console.error('Failed to load data', error);
@@ -101,40 +90,108 @@ export default function GiftsPage() {
     loadData();
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // Update myGifts when currentUser or gifts change
+  useEffect(() => {
+    if (currentUser && gifts.length > 0) {
+      const userGifts = gifts.filter((g: GiftItem) => g.userId === currentUser.id);
+      setMyGifts(userGifts);
+    }
+  }, [currentUser, gifts]);
+
+  const handleJoin = async () => {
     try {
-      const res = await fetch('/api/gifts', {
+      const res = await fetch('/api/participants', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
       });
 
       if (res.ok) {
-        setShowForm(false);
-        setIsEditing(false);
-        setFormData({ name: '', description: '' });
-        fetchGifts();
+        setIsParticipating(true);
+      }
+    } catch (error) {
+      console.error('Failed to join', error);
+    }
+  };
+
+  const handleLeave = async () => {
+    if (!confirm('Are you sure you want to leave White Elephant? Your gifts will remain but you won\'t be listed as a participant.')) {
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/participants', {
+        method: 'DELETE',
+      });
+
+      if (res.ok) {
+        setIsParticipating(false);
+      }
+    } catch (error) {
+      console.error('Failed to leave', error);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      if (editingGiftId) {
+        // Update existing gift
+        const res = await fetch(`/api/gifts/${editingGiftId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData),
+        });
+
+        if (res.ok) {
+          setShowForm(false);
+          setEditingGiftId(null);
+          setFormData({ name: '', description: '' });
+          fetchGifts();
+        }
+      } else {
+        // Create new gift
+        const res = await fetch('/api/gifts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData),
+        });
+
+        if (res.ok) {
+          setShowForm(false);
+          setFormData({ name: '', description: '' });
+          fetchGifts();
+        }
       }
     } catch (error) {
       console.error('Failed to save gift', error);
     }
   };
 
-  const handleDelete = async () => {
-    if (!confirm('Are you sure you want to remove your gift and opt out of White Elephant?')) {
+  const handleAddGift = () => {
+    setEditingGiftId(null);
+    setFormData({ name: '', description: '' });
+    setShowForm(true);
+  };
+
+  const handleEditGift = (gift: GiftItem) => {
+    setEditingGiftId(gift.id);
+    setFormData({
+      name: gift.name,
+      description: gift.description || '',
+    });
+    setShowForm(true);
+  };
+
+  const handleDeleteGift = async (giftId: number) => {
+    if (!confirm('Are you sure you want to remove this gift?')) {
       return;
     }
 
     try {
-      const res = await fetch('/api/gifts', {
+      const res = await fetch(`/api/gifts/${giftId}`, {
         method: 'DELETE',
       });
 
       if (res.ok) {
-        setIsParticipating(false);
-        setMyGift(null);
-        setFormData({ name: '', description: '' });
         fetchGifts();
       }
     } catch (error) {
@@ -142,29 +199,11 @@ export default function GiftsPage() {
     }
   };
 
-  const handleAddGift = () => {
-    setIsEditing(false);
-    setFormData({ name: '', description: '' });
-    setShowForm(true);
-  };
-
-  const handleEditGift = () => {
-    if (myGift) {
-      setIsEditing(true);
-      setFormData({
-        name: myGift.name,
-        description: myGift.description || '',
-      });
-      setShowForm(true);
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-20">
-      <div className="sticky top-0 z-10 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center justify-between">
+        <div className="sticky top-0 z-10 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center justify-between">
         <h1 className="text-xl font-bold text-gray-900 dark:text-white">White Elephant</h1>
         <div className="flex items-center gap-2">
-          <ThemeToggle />
           {isParticipating && (
             <button
               onClick={handleAddGift}
@@ -180,7 +219,7 @@ export default function GiftsPage() {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-xl border border-gray-200 dark:border-gray-700">
             <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
-              {isEditing ? 'Edit Your Gift' : 'Add Your Gift'}
+              {editingGiftId ? 'Edit Gift' : 'Add a Gift'}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
@@ -215,7 +254,7 @@ export default function GiftsPage() {
                   type="button"
                   onClick={() => {
                     setShowForm(false);
-                    setIsEditing(false);
+                    setEditingGiftId(null);
                     setFormData({ name: '', description: '' });
                   }}
                   className="flex-1 py-2 px-4 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
@@ -226,7 +265,7 @@ export default function GiftsPage() {
                   type="submit"
                   className="flex-1 py-2 px-4 rounded-lg bg-red-600 text-white hover:bg-red-700"
                 >
-                  {isEditing ? 'Update Gift' : 'Add Gift'}
+                  {editingGiftId ? 'Update Gift' : 'Add Gift'}
                 </button>
               </div>
             </form>
@@ -240,51 +279,91 @@ export default function GiftsPage() {
             <div>
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Your Participation</h2>
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                {isParticipating ? 'You are participating in White Elephant' : 'Join the White Elephant gift exchange'}
+                {isParticipating 
+                  ? myGifts.length > 0 
+                    ? `You're participating with ${myGifts.length} gift${myGifts.length !== 1 ? 's' : ''}`
+                    : "You're participating! Add gifts or just enjoy the exchange."
+                  : 'Join to participate in the gift exchange. Adding gifts is optional!'}
               </p>
             </div>
           </div>
 
           {!isParticipating ? (
             <button
-              onClick={handleAddGift}
+              onClick={handleJoin}
               className="w-full py-3 px-4 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors font-medium flex items-center justify-center gap-2"
             >
               <Plus className="w-5 h-5" />
-              Add Your Gift to Join
+              Join White Elephant
             </button>
-          ) : myGift ? (
+          ) : (
             <div className="space-y-3">
-              <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900 dark:text-white">{myGift.name}</h3>
-                    {myGift.description && (
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{myGift.description}</p>
-                    )}
-                    {myGift.turnOrder && (
-                      <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
-                        Turn order: #{myGift.turnOrder}
-                      </p>
-                    )}
-                  </div>
+              {myGifts.length === 0 ? (
+                <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg text-center">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                    You haven't added any gifts yet
+                  </p>
                   <button
-                    onClick={handleEditGift}
-                    className="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-400"
+                    onClick={handleAddGift}
+                    className="py-2 px-4 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors font-medium inline-flex items-center gap-2"
                   >
-                    <Edit2 className="w-4 h-4" />
+                    <Plus className="w-4 h-4" />
+                    Add a Gift
                   </button>
                 </div>
-              </div>
+              ) : (
+                <>
+                  <div className="space-y-2">
+                    <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Your Gifts ({myGifts.length})
+                    </h3>
+                    {myGifts.map((gift) => (
+                      <div
+                        key={gift.id}
+                        className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg"
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2">
+                              <h4 className="font-semibold text-gray-900 dark:text-white">{gift.name}</h4>
+                              {gift.turnOrder && (
+                                <span className="px-2 py-0.5 text-xs font-bold bg-red-600 text-white rounded-full">
+                                  #{gift.turnOrder}
+                                </span>
+                              )}
+                            </div>
+                            {gift.description && (
+                              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{gift.description}</p>
+                            )}
+                          </div>
+                          <div className="flex gap-1 ml-2">
+                            <button
+                              onClick={() => handleEditGift(gift)}
+                              className="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-400"
+                            >
+                              <Edit2 className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteGift(gift.id)}
+                              className="p-2 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-red-600 dark:text-red-400"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
               <button
-                onClick={handleDelete}
-                className="w-full py-2 px-4 rounded-lg border border-red-300 dark:border-red-700 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors font-medium flex items-center justify-center gap-2"
+                onClick={handleLeave}
+                className="w-full py-2 px-4 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-medium"
               >
-                <Trash2 className="w-4 h-4" />
-                Remove Gift & Opt Out
+                Leave White Elephant
               </button>
             </div>
-          ) : null}
+          )}
         </div>
 
         <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
@@ -352,4 +431,3 @@ export default function GiftsPage() {
     </div>
   );
 }
-

@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.87.0",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "drizzle-kit": "^0.31.8",
